@@ -1,0 +1,8 @@
+[package]
+name = "sphynx_input"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+winit = { workspace = true }
+cgmath = { workspace = true }

@@ -1,0 +1,22 @@
+# this is similar to a .cargo/config.toml file
+# however, since it uses the mold linker and the cranelift codegen-backend
+# i have renamed it to .cargo/fast_dev_config.toml so it is not used by default
+# in order to use this config, add "--config ./.cargo/fast_dev_config.toml" to any cargo command
+# or just run the commands available in the justfile
+# it only really makes sense for faster dev builds on native x86_64. wasm is not supported by cranelift
+
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+# mold should be installed (already done if you use the flake.nix)
+rustflags = ["-C", "link-arg=-fuse-ld=mold", "-Zshare-generics=y", "-Zmacro-backtrace=y"]
+
+[unstable]
+codegen-backend = true
+
+[profile.dev]
+codegen-backend = "cranelift"
+[profile.dev.package."game"]
+codegen-backend = "cranelift"
+# add more packages that could change fairly often and dont really need the llvm codegen-backend
+[profile.dev.package."*"]
+codegen-backend = "llvm"
