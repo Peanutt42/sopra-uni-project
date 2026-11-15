@@ -25,4 +25,4 @@ wasm-bindgen-futures = "0.4"
 [features]
 default = []
 egui = ["sphynx_rendering/egui", "dep:sphynx_egui"]
-hot-reload = ["dep:hot-lib-reloader"]
+hot-reload = ["dep:hot-lib-reloader", "sphynx_rendering/hot-reload"]
