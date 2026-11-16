@@ -6,6 +6,10 @@ default:
 check-dev *extra_cargo_args:
 	cargo clippy --all --features egui --features hot-reload --config ./.cargo/fast_dev_config.toml --color always {{extra_cargo_args}}
 
+# Runs clippy on the entire project with every possible feature combination using the fast dev cargo configuration (mold linker + cranelift codegen-backend). requires cargo-hack
+check-dev-all *extra_cargo_args:
+	cargo hack --feature-powerset --all clippy --config ./.cargo/fast_dev_config.toml --color always {{extra_cargo_args}}
+
 # Runs the game using the fast dev cargo configuration (mold linker + cranelift codegen-backend)
 run-dev extra_cargo_args="":
 	cargo run --features egui --features hot-reload --config ./.cargo/fast_dev_config.toml --color always {{extra_cargo_args}}
@@ -27,3 +31,7 @@ serve-web *extra_args:
 # Run clippy on the entire project using the wasm target
 check-web *extra_args:
     cargo clippy --all --target wasm32-unknown-unknown {{extra_args}}
+
+# Run clippy on the entire project with every possible feature combination (execpt for hot-reload which is unsupported) using the wasm target. requires cargo-hack
+check-web-all *extra_args:
+	cargo hack --feature-powerset --all --exclude-features hot-reload clippy --target wasm32-unknown-unknown {{extra_args}}
