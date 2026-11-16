@@ -87,7 +87,6 @@
                   ./src
                   ./game
                   ./crates
-                  ./web
                   ./assets
                 ];
               };
