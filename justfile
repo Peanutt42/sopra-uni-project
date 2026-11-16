@@ -4,20 +4,20 @@ default:
 
 # Runs clippy on the entire project using the fast dev cargo configuration (mold linker + cranelift codegen-backend)
 check-dev *extra_cargo_args:
-	cargo clippy --all --features egui --features hot-reload --config ./.cargo/fast_dev_config.toml --color always {{extra_cargo_args}}
+	cargo clippy --all --features egui --features hot-reload --config ./.cargo/fast_dev_config.toml {{extra_cargo_args}}
 
 # Runs clippy on the entire project with every possible feature combination using the fast dev cargo configuration (mold linker + cranelift codegen-backend). requires cargo-hack
 check-dev-all *extra_cargo_args:
-	cargo hack --feature-powerset --all clippy --config ./.cargo/fast_dev_config.toml --color always {{extra_cargo_args}}
+	cargo hack --feature-powerset --all clippy --config ./.cargo/fast_dev_config.toml {{extra_cargo_args}}
 
 # Runs the game using the fast dev cargo configuration (mold linker + cranelift codegen-backend)
 run-dev extra_cargo_args="":
-	cargo run --features egui --features hot-reload --config ./.cargo/fast_dev_config.toml --color always {{extra_cargo_args}}
+	cargo run --features egui --features hot-reload --config ./.cargo/fast_dev_config.toml {{extra_cargo_args}}
 
 # Runs the game/engine with hot-reload enabled, will rebuild the game lib when change is detected
 run-dev-hotreloadable cargo_args="" engine_only_cargo_args="":
     parallel --line-buffer --halt now,done=1 ::: \
-      "cargo run --config ./.cargo/fast_dev_config.toml --features hot-reload --color always {{cargo_args}} {{engine_only_cargo_args}}" \
+      "CLICOLOR_FORCE=1 cargo run --config ./.cargo/fast_dev_config.toml --features hot-reload --color always {{cargo_args}} {{engine_only_cargo_args}}" \
       "cargo watch -w game -x 'build --config ./.cargo/fast_dev_config.toml -p game --features hot-reload --color always {{cargo_args}}'"
 
 # Build the web crate bundle into web/dist
