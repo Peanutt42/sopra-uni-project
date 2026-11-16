@@ -11,7 +11,7 @@ sphynx_wesl = { workspace = true, optional = true }
 sphynx_egui = { workspace = true, optional = true }
 winit = { workspace = true }
 wgpu = { workspace = true }
-anyhow = { workspace = true }
+thiserror = { workspace = true }
 cgmath = { workspace = true }
 bytemuck = { workspace = true }
 wavefront = { workspace = true }

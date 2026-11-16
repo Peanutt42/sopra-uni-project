@@ -163,12 +163,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "anyhow"
-version = "1.0.104"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
-
-[[package]]
 name = "approx"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2907,7 +2901,6 @@ dependencies = [
 name = "sphynx_core"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "cgmath",
  "hecs",
  "hot-lib-reloader",
@@ -2917,6 +2910,7 @@ dependencies = [
  "sphynx_input",
  "sphynx_logging",
  "sphynx_rendering",
+ "thiserror 2.0.21",
  "wasm-bindgen-futures",
  "web-time",
  "winit",
@@ -2947,7 +2941,6 @@ dependencies = [
 name = "sphynx_engine"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "game",
  "hecs",
  "hot-lib-reloader",
@@ -3009,7 +3002,6 @@ dependencies = [
 name = "sphynx_rendering"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "bytemuck",
  "cgmath",
  "notify-debouncer-full 0.7.0",
@@ -3018,6 +3010,7 @@ dependencies = [
  "sphynx_logging",
  "sphynx_wesl",
  "sphynx_wesl_include",
+ "thiserror 2.0.21",
  "wavefront",
  "wgpu",
  "winit",

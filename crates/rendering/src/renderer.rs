@@ -16,6 +16,7 @@ use sphynx_egui::EguiRenderer;
 use sphynx_logging::warning;
 use sphynx_logging::{error, info};
 use std::sync::Arc;
+use thiserror::Error;
 use wgpu::{
 	Backends, Color, CommandEncoderDescriptor, CurrentSurfaceTexture, Device, DeviceDescriptor,
 	ExperimentalFeatures, Features, Instance, InstanceDescriptor, Limits, LoadOp, MemoryHints,
@@ -25,6 +26,25 @@ use wgpu::{
 };
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
+
+#[derive(Debug, Error)]
+pub enum CreateRendererError {
+	#[error(transparent)]
+	CreateSurfaceError(#[from] wgpu::CreateSurfaceError),
+	#[error("failed to find an appropriate adapter: {0}")]
+	FailedToFindAdapter(#[from] wgpu::RequestAdapterError),
+	#[error(transparent)]
+	RequestDeviceError(#[from] wgpu::RequestDeviceError),
+	#[error("failed to get surface config")]
+	FailedToGetSurfaceConfig,
+	#[error("failed to load model file: {0}")]
+	FailedToLoadModelFile(#[from] wavefront::Error),
+	#[cfg(target_arch = "wasm32")]
+	#[error("failed to initialize WebGPU or the WebGL2 fallback: {0}")]
+	FailedToInitializeWGPUOrWebGL2(Box<CreateRendererError>),
+}
+
+pub type CreateRendererResult = Result<Renderer, CreateRendererError>;
 
 pub struct Renderer {
 	surface: Surface<'static>,
@@ -54,7 +74,7 @@ pub struct Renderer {
 impl Renderer {
 	pub const MAX_INSTANCES: usize = 100;
 
-	pub async fn new(window: Arc<Window>, vsync: bool) -> anyhow::Result<Self> {
+	pub async fn new(window: Arc<Window>, vsync: bool) -> CreateRendererResult {
 		#[cfg(target_arch = "wasm32")]
 		{
 			if wgpu::util::is_browser_webgpu_supported().await {
@@ -76,10 +96,8 @@ impl Renderer {
 
 			Self::new_with_backend(window, vsync, Some(Backends::GL))
 				.await
-				.map_err(|webgl_error| {
-					anyhow::anyhow!(
-						"failed to initialize WebGPU or the WebGL2 fallback: {webgl_error:#}"
-					)
+				.map_err(|create_error| {
+					CreateRendererError::FailedToInitializeWGPUOrWebGL2(Box::new(create_error))
 				})
 		}
 
@@ -93,7 +111,7 @@ impl Renderer {
 		window: Arc<Window>,
 		vsync: bool,
 		backends: Option<Backends>,
-	) -> anyhow::Result<Self> {
+	) -> CreateRendererResult {
 		let mut size = window.inner_size();
 		size.width = size.width.max(1);
 		size.height = size.height.max(1);
@@ -124,8 +142,7 @@ impl Renderer {
 				compatible_surface: pending_surface.as_ref(),
 				apply_limit_buckets: false,
 			})
-			.await
-			.map_err(|e| anyhow::anyhow!("Failed to find an appropriate adapter: {e}"))?;
+			.await?;
 
 		let adapter_info = adapter.get_info();
 		info!(
@@ -152,7 +169,7 @@ impl Renderer {
 
 		let mut swapchain_config = surface
 			.get_default_config(&adapter, size.width, size.height)
-			.ok_or(anyhow::anyhow!("Failed to get surface config"))?;
+			.ok_or(CreateRendererError::FailedToGetSurfaceConfig)?;
 		let swapchain_capabilities = surface.get_capabilities(&adapter);
 		swapchain_config.format = swapchain_capabilities.formats[0];
 		let swapchain_texture_view_format = swapchain_config.format.add_srgb_suffix();

@@ -15,7 +15,7 @@ mod vertex;
 pub use camera::Camera;
 pub use mesh::Mesh;
 pub use model::load_obj_model;
-pub use renderer::Renderer;
+pub use renderer::{CreateRendererError, CreateRendererResult, Renderer};
 pub use shader::Shader;
 pub use transfrom::Transform;
 

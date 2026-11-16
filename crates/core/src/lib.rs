@@ -2,8 +2,9 @@ use camera_controller::CameraController;
 use cgmath::{Quaternion, Vector3, Zero};
 use sphynx_input::Input;
 use sphynx_logging::*;
-use sphynx_rendering::{Renderer, Transform};
+use sphynx_rendering::{CreateRendererError, Renderer, Transform};
 use std::sync::Arc;
+use thiserror::Error;
 use web_time::Instant;
 use winit::{
 	application::ApplicationHandler,
@@ -21,6 +22,14 @@ pub use game::GameApi;
 
 mod platform;
 
+#[derive(Debug, Error)]
+pub enum EngineError {
+	#[error("failed to create renderer: {0}")]
+	CreateRenderer(#[from] CreateRendererError),
+	#[error(transparent)]
+	Winit(#[from] winit::error::EventLoopError),
+}
+
 #[derive(Debug, Default)]
 pub struct EngineConfig {
 	pub fullscreen: bool,
@@ -35,7 +44,7 @@ impl EngineConfig {
 		self,
 		game_api: GameApi<G, S>,
 		#[cfg(feature = "hot-reload")] hot_reload_observer: hot_lib_reloader::LibReloadObserver,
-	) -> anyhow::Result<()> {
+	) -> Result<(), EngineError> {
 		let engine = Engine::<G, S>::new(
 			self,
 			game_api,
@@ -83,7 +92,7 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 		config: EngineConfig,
 		game_api: GameApi<G, S>,
 		#[cfg(feature = "hot-reload")] hot_reload_observer: hot_lib_reloader::LibReloadObserver,
-	) -> anyhow::Result<Self> {
+	) -> Result<Self, EngineError> {
 		info!(General, "=== INITIALIZING ===");
 
 		let game_ptr = (game_api.create)();
@@ -109,7 +118,7 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 		})
 	}
 
-	pub fn run(self, event_loop: EventLoop<()>) -> anyhow::Result<()> {
+	pub fn run(self, event_loop: EventLoop<()>) -> Result<(), EngineError> {
 		platform::run(self, event_loop)
 	}
 

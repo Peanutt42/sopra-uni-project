@@ -1,6 +1,5 @@
-use crate::Engine;
-use anyhow::Result;
-use sphynx_rendering::Renderer;
+use crate::{Engine, EngineError};
+use sphynx_rendering::{CreateRendererResult, Renderer};
 use std::{cell::RefCell, rc::Rc, sync::Arc};
 use winit::{
 	event_loop::EventLoop,
@@ -8,7 +7,10 @@ use winit::{
 	window::{Window, WindowAttributes},
 };
 
-pub fn run<G: 'static, S: 'static>(engine: Engine<G, S>, event_loop: EventLoop<()>) -> Result<()> {
+pub fn run<G: 'static, S: 'static>(
+	engine: Engine<G, S>,
+	event_loop: EventLoop<()>,
+) -> Result<(), EngineError> {
 	event_loop.spawn_app(engine);
 	Ok(())
 }
@@ -22,7 +24,7 @@ pub fn configure_window(attributes: WindowAttributes, _fullscreen: bool) -> Wind
 
 /// holds reference to the result of the async task that creates the renderer
 pub struct RendererInit {
-	result: Rc<RefCell<Option<Result<Renderer>>>>,
+	result: Rc<RefCell<Option<CreateRendererResult>>>,
 }
 impl RendererInit {
 	pub fn start(window: Arc<Window>, vsync: bool) -> Self {
@@ -38,7 +40,7 @@ impl RendererInit {
 
 		Self { result }
 	}
-	pub fn poll(&mut self) -> Option<Result<Renderer>> {
+	pub fn poll(&mut self) -> Option<CreateRendererResult> {
 		self.result.borrow_mut().take()
 	}
 }

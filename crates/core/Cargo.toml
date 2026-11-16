@@ -10,7 +10,7 @@ sphynx_rendering = { workspace = true }
 sphynx_egui = { workspace = true, optional = true }
 sphynx_hecs_component = { workspace = true }
 hecs = { workspace = true }
-anyhow = { workspace = true }
+thiserror = { workspace = true }
 winit = { workspace = true }
 cgmath = { workspace = true }
 hot-lib-reloader = { workspace = true, optional = true }

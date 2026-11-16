@@ -8,7 +8,7 @@ macro_rules! include_model {
 	($filepath:expr, $device:expr) => {{ load_obj_model(include_bytes!($filepath) as &[u8], $device) }};
 }
 
-pub fn load_obj_model<B>(buf_reader: B, device: &Device) -> anyhow::Result<Mesh>
+pub fn load_obj_model<B>(buf_reader: B, device: &Device) -> Result<Mesh, wavefront::Error>
 where
 	B: BufRead,
 {

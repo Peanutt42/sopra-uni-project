@@ -1,8 +1,8 @@
-use sphynx_core::{EngineConfig, GameApi};
+use sphynx_core::{EngineConfig, EngineError, GameApi};
 
 use game::{Game, SerializedGame};
 
-fn main() -> anyhow::Result<()> {
+fn main() -> Result<(), EngineError> {
 	#[cfg(feature = "hot-reload")]
 	let observer = game_lib::subscribe();
 

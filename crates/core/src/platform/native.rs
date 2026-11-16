@@ -1,14 +1,16 @@
-use crate::Engine;
-use anyhow::Result;
+use crate::{Engine, EngineError};
 use sphynx_logging::info;
-use sphynx_rendering::Renderer;
+use sphynx_rendering::{CreateRendererError, CreateRendererResult, Renderer};
 use std::sync::Arc;
 use winit::{
 	event_loop::EventLoop,
 	window::{Fullscreen, Window, WindowAttributes},
 };
 
-pub fn run<G: 'static, S: 'static>(engine: Engine<G, S>, event_loop: EventLoop<()>) -> Result<()> {
+pub fn run<G: 'static, S: 'static>(
+	engine: Engine<G, S>,
+	event_loop: EventLoop<()>,
+) -> Result<(), EngineError> {
 	let mut engine = engine;
 	event_loop.run_app(&mut engine)?;
 
@@ -26,7 +28,7 @@ pub fn configure_window(attributes: WindowAttributes, fullscreen: bool) -> Windo
 }
 
 pub struct RendererInit {
-	result: Option<Result<Renderer>>,
+	result: Option<Result<Renderer, CreateRendererError>>,
 }
 impl RendererInit {
 	pub fn start(window: Arc<Window>, vsync: bool) -> Self {
@@ -34,7 +36,7 @@ impl RendererInit {
 			result: Some(pollster::block_on(Renderer::new(window, vsync))),
 		}
 	}
-	pub fn poll(&mut self) -> Option<Result<Renderer>> {
+	pub fn poll(&mut self) -> Option<CreateRendererResult> {
 		self.result.take()
 	}
 }
