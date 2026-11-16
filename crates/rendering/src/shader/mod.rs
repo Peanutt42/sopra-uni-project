@@ -6,8 +6,9 @@ use wgpu::{
 	StencilState, TextureFormat, VertexBufferLayout, VertexState,
 };
 
+// suppress cargo unused, since hot-reload on wasm is not possible
 #[cfg(all(feature = "hot-reload", target_arch = "wasm32"))]
-use sphynx_wesl as _; // suppress cargo unused, since hot-reload on wasm is not possible
+use sphynx_wesl as _;
 
 #[cfg(not(all(feature = "hot-reload", not(target_arch = "wasm32"))))]
 pub mod static_inline;

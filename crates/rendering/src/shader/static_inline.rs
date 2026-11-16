@@ -1,3 +1,12 @@
+use crate::instance_data::InstanceData;
+use crate::shader::create_pipeline;
+use crate::vertex::Vertex;
+use std::borrow::Cow;
+use wgpu::{
+	BindGroupLayout, Device, RenderPass, RenderPipeline, ShaderSource, TextureFormat,
+	VertexBufferLayout,
+};
+
 #[cfg(not(all(feature = "hot-reload", not(target_arch = "wasm32"))))]
 #[macro_export]
 macro_rules! include_shader {
@@ -30,10 +39,7 @@ macro_rules! include_custom_shader {
 }
 
 pub struct Shader {
-	#[cfg(not(all(feature = "hot-reload", not(target_arch = "wasm32"))))]
 	pipeline: RenderPipeline,
-	#[cfg(all(feature = "hot-reload", not(target_arch = "wasm32")))]
-	hot_reloader: ShaderReloader,
 }
 
 impl Shader {
@@ -97,23 +103,10 @@ impl Shader {
 			swapchain_texture_view_format,
 		);
 
-		Self {
-			pipeline,
-			#[cfg(all(feature = "hot-reload", not(target_arch = "wasm32")))]
-			hot_reloader: None,
-		}
+		Self { pipeline }
 	}
 
 	pub fn bind<'a>(&'a self, renderpass: &'_ mut RenderPass<'a>) {
-		#[cfg(all(feature = "hot-reload", not(target_arch = "wasm32")))]
-		{
-			if let Some(reload) = self.hot_reloader.as_mut()
-				&& let Some(pipeline) = reload.try_reload()
-			{
-				self.pipeline = pipeline;
-			}
-		}
-
 		renderpass.set_pipeline(&self.pipeline);
 	}
 }

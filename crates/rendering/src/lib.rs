@@ -18,3 +18,6 @@ pub use model::load_obj_model;
 pub use renderer::Renderer;
 pub use shader::Shader;
 pub use transfrom::Transform;
+
+#[cfg(all(feature = "hot-reload", target_arch = "wasm32"))]
+compile_error!("The `hot-reload` feature is not supported on web (WASM).");
