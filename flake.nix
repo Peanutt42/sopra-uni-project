@@ -60,6 +60,7 @@
           mold # for faster debug builds
           parallel # for running the game and rebuilding game lib in parallel
           wgsl-analyzer # for wgsl-analyzer, but also for wgslfmt
+          sccache # for caching rust compiler results, useful for git worktrees
         ];
         buildInputs = runtimeLibsFor pkgs;
       };
@@ -132,6 +133,7 @@
           env.RUST_BACKTRACE = "1";
           shellHook = ''
             export LD_LIBRARY_PATH="${lib.makeLibraryPath (runtimeLibsFor pkgs)}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+            export RUSTC_WRAPPER="${pkgs.sccache}/bin/sccache"
           '';
         };
 
