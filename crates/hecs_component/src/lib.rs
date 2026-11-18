@@ -31,11 +31,13 @@ pub struct ComponentType {
 	/// deserialize a JSON array of values and append them to `batch`.
 	pub deserialize:
 		fn(json: &str, batch_builder: &mut hecs::ColumnBatchBuilder) -> serde_json::Result<()>,
+	/// runs the read-only visitor
 	pub visit: fn(hecs::EntityRef<'_>, &mut dyn reflection::Visitor) -> bool,
+	/// mutable version of [Self::visit]
 	pub visit_mut: fn(&hecs::World, hecs::Entity, &mut dyn reflection::VisitorMut) -> bool,
-	/// Insert a default-constructed component into the entity.
+	/// insert a default-constructed component into the entity.
 	pub insert_default: fn(&mut hecs::World, hecs::Entity),
-	/// Remove this component from the entity. Returns true if it was present.
+	/// remove this component from the entity. Returns true if it was present.
 	pub remove: fn(&mut hecs::World, hecs::Entity) -> bool,
 }
 

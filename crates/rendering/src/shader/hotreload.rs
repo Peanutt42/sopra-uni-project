@@ -18,6 +18,7 @@ use wgpu::{
 	VertexBufferLayout,
 };
 
+/// includes a wesl shader module from the specified shader package (also supports hot-reloading)
 #[macro_export]
 macro_rules! include_shader {
 	($shader_root_dir:literal, $shader_module_name:literal, $bindings:expr, $device:expr, $swapchain_format:expr) => {{
@@ -36,6 +37,8 @@ macro_rules! include_shader {
 	}};
 }
 
+/// same as [include_shader] but for custom Vertex and Instance datatypes (also supports
+/// hot-reloading)
 #[macro_export]
 macro_rules! include_custom_shader {
 	($vertex:expr, $instance:expr, $shader_root_dir:expr, $shader_module_name:expr, $bindings:expr, $device:expr, $swapchain_format:expr) => {{
@@ -51,6 +54,7 @@ macro_rules! include_custom_shader {
 	}};
 }
 
+/// a shader based on wgsl shader code that checks when the referenced file change and then hot-reloads
 pub struct Shader {
 	shader_dir: PathBuf,
 	module: String,
@@ -125,6 +129,7 @@ impl Shader {
 		}
 	}
 
+	/// same as [Self::from_str] but with instanced with [InstanceData]
 	pub fn from_wesl_instanced<V: Vertex, I: InstanceData>(
 		shader_root_dir: &str,
 		shader_module_name: &str,
@@ -142,6 +147,7 @@ impl Shader {
 		)
 	}
 
+	/// binds the shader to the renderpass
 	pub fn bind<'a>(&'a self, renderpass: &'_ mut RenderPass<'a>) {
 		self.try_recompile_shader_pipeline();
 
@@ -149,6 +155,8 @@ impl Shader {
 		renderpass.set_pipeline(&self.render_pipeline.borrow().clone());
 	}
 
+	/// checks if the file watcher sent any file events and recompiles if any referenced files by
+	/// this shader have changed
 	fn try_recompile_shader_pipeline(&self) {
 		loop {
 			match self.hot_reload_receiver.try_recv() {

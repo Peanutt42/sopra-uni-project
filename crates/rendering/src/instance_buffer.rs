@@ -5,6 +5,7 @@ use wgpu::{
 	util::{BufferInitDescriptor, DeviceExt},
 };
 
+/// stores both the cpu memory instance data as well as the handle to the gpu buffer
 pub struct InstanceBuffer<I: InstanceData> {
 	pub instances: Vec<I>,
 	buffer: Buffer,
@@ -21,10 +22,12 @@ impl<I: InstanceData> InstanceBuffer<I> {
 		Self { instances, buffer }
 	}
 
+	/// only actually updates when the queue is submitted with [wgpu::Queue::submit]
 	pub fn update(&self, queue: &Queue) {
 		queue.write_buffer(&self.buffer, 0, bytemuck::cast_slice(&self.instances));
 	}
 
+	/// binds the instance buffer to a shader
 	pub fn bind<'a>(&'a self, renderpass: &'_ mut RenderPass<'a>) {
 		renderpass.set_vertex_buffer(INSTANCE_BUFFER_BIND_SLOT, self.buffer.slice(..));
 	}

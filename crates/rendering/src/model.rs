@@ -3,6 +3,7 @@ use std::io::BufRead;
 use wavefront::{Obj, Vertex};
 use wgpu::Device;
 
+/// includes the model file while compiling (currently only obj file format)
 #[macro_export]
 macro_rules! include_model {
 	($filepath:expr, $device:expr) => {{ load_obj_model(include_bytes!($filepath) as &[u8], $device) }};

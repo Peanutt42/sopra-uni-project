@@ -6,6 +6,8 @@ use winit::{
 	keyboard::{KeyCode, PhysicalKey},
 };
 
+/// stores all information needed for input handling. also stores information to detect when keys
+/// are pressed down (compared to holding a key down)
 pub struct Input {
 	pub mouse_delta: Vector2<f32>,
 	pub cursor_position: PhysicalPosition<f64>,
@@ -74,6 +76,7 @@ impl Input {
 		false
 	}
 
+	/// extract all keyboard events and store in [self]
 	pub fn handle_keyboard(&mut self, keyboard_event: KeyEvent) {
 		if let PhysicalKey::Code(key_code) = keyboard_event.physical_key {
 			match keyboard_event.state {
@@ -87,6 +90,7 @@ impl Input {
 		}
 	}
 
+	/// extract all mouse button events and store in [self]
 	pub fn handle_mouse(&mut self, button: MouseButton, state: ElementState) {
 		match state {
 			ElementState::Pressed => {
@@ -98,15 +102,18 @@ impl Input {
 		}
 	}
 
+	/// receive mouse movement events and store in [self]
 	pub fn handle_mouse_movement(&mut self, (delta_x, delta_y): (f64, f64)) {
 		self.mouse_delta.x += delta_x as f32;
 		self.mouse_delta.y += delta_y as f32;
 	}
 
+	/// receive the absolute cursor position
 	pub fn handle_cursor_movement(&mut self, new_position: PhysicalPosition<f64>) {
 		self.cursor_position = new_position;
 	}
 
+	/// start a new frame by clearing information only stored for a frame
 	pub fn clear_frame(&mut self) {
 		self.mouse_delta = Vector2::zero();
 		self.last_frame_key_states.clone_from(&self.key_states);

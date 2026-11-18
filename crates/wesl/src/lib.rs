@@ -5,6 +5,7 @@ use wesl::resolver::{FileResolver, Router, StandardResolver};
 use wesl::syntax::{ModulePath, PathOrigin};
 use wesl::toml_cfg::{DependenciesConfig, DependencySpec, WeslToml};
 
+/// wesl shader code is compiled to wgsl code, tracking the referenced files for automatic hot-reloading
 #[derive(Debug, Clone)]
 pub struct CompiledShader {
 	/// wgsl code generated from wesl code

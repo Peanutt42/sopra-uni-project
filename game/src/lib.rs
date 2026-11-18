@@ -9,11 +9,14 @@ use sphynx_hecs_component::{Reflect, hecs_component};
 /// Just to verify if hot-reload actually happend
 pub const VERSION: u64 = 1;
 
+/// Stores the games state
 pub struct Game {
 	pub world: hecs::World,
 	pub spawn_counter: u32,
 }
 
+/// Represents the serialized game state needed when hot-reloading (different from the actual game
+/// saving mechanic!)
 pub struct SerializedGame {
 	pub spawn_counter: u32,
 	pub world_snapshot: sphynx_hecs_component::serialization::Snapshot,

@@ -12,6 +12,8 @@ pub struct GameApi<Game, SerializedGame> {
 	pub get_component_types: fn() -> Vec<&'static sphynx_hecs_component::ComponentType>,
 }
 
+/// checks if the game library has been updated and hot-reloads by serializing a snapshot of the
+/// game state, load the new library and deserializing from the snapshot.
 #[cfg(feature = "hot-reload")]
 pub fn try_reload_game<Game, SerializedGame>(
 	observer: &hot_lib_reloader::LibReloadObserver,

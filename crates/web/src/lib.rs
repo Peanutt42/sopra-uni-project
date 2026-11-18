@@ -4,6 +4,7 @@ mod browser {
 	use sphynx_core::{EngineConfig, GameApi};
 	use wasm_bindgen::prelude::*;
 
+	/// entry point for the web (for native desktop platforms, see ../../../src/main.rs)
 	#[wasm_bindgen(start)]
 	pub fn start() -> Result<(), JsValue> {
 		console_error_panic_hook::set_once();

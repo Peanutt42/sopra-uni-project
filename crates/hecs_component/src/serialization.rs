@@ -2,17 +2,21 @@ use crate::registered_component_types;
 use hecs::{ColumnBatchType, Entity, World};
 use serde::{Deserialize, Serialize, de::Error};
 
+/// stores a hot-reload-persistent snapshot of a [hecs::World] that preserves field names etc. by
+/// storing in JSON
 #[derive(Serialize, Deserialize)]
 pub struct Snapshot {
 	pub archetypes: Vec<ArchetypeRecord>,
 }
 
+/// stores all entities of that archetype and the columns (<=> components) for each entity
 #[derive(Serialize, Deserialize)]
 pub struct ArchetypeRecord {
 	pub entities: Vec<u64>,
 	pub columns: Vec<ComponentColumnRecord>,
 }
 
+/// stores the component type name as well as a JSON serialized [hecs::ArchetypeColumn]
 #[derive(Serialize, Deserialize)]
 pub struct ComponentColumnRecord {
 	pub component_type_name: String,
@@ -23,6 +27,7 @@ pub struct ComponentColumnRecord {
 	pub serialized_components: String,
 }
 
+/// serializes a [hecs::World] to a [Snapshot]
 pub fn serialize(world: &World) -> serde_json::Result<Snapshot> {
 	let archetypes = world
 		.archetypes()
@@ -55,6 +60,7 @@ pub fn serialize(world: &World) -> serde_json::Result<Snapshot> {
 	Ok(Snapshot { archetypes })
 }
 
+/// deserializes a [Snapshot] back to a [hecs::World]
 pub fn deserialize(snapshot: Snapshot) -> serde_json::Result<World> {
 	let mut world = World::new();
 

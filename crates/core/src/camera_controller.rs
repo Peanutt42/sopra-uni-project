@@ -6,6 +6,7 @@ use winit::{event::MouseButton, keyboard::KeyCode};
 use std::f32::consts::FRAC_PI_2;
 const SAFE_FRAC_PI_2: f32 = FRAC_PI_2 - f32::EPSILON;
 
+/// Debug free-fly camera controller
 pub struct CameraController {
 	speed: f32,
 	sensitivity: f32,

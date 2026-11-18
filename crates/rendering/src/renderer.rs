@@ -27,6 +27,7 @@ use wgpu::{
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
+/// all possible errors when creating the wgpu renderer
 #[derive(Debug, Error)]
 pub enum CreateRendererError {
 	#[error(transparent)]
@@ -46,6 +47,7 @@ pub enum CreateRendererError {
 
 pub type CreateRendererResult = Result<Renderer, CreateRendererError>;
 
+/// stores all wgpu handles for rendering to the game window
 pub struct Renderer {
 	surface: Surface<'static>,
 	window: Arc<Window>,
@@ -260,6 +262,7 @@ impl Renderer {
 		})
 	}
 
+	/// must be called when window is resized
 	pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
 		self.reconfigure(new_size);
 	}
@@ -275,6 +278,7 @@ impl Renderer {
 		self.depth_texture = DepthTexture::new(&self.device, &self.swapchain_config);
 	}
 
+	/// renders a new frame
 	pub fn update(
 		&mut self,
 		#[cfg(feature = "egui")] egui_callback: impl FnOnce(&sphynx_egui::egui::Context),

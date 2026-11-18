@@ -1,3 +1,4 @@
+/// draws a simple debug window to show fps counter and have button to open entity inspector
 pub fn debug_window(ctx: &egui::Context, dt: f32, game_version: u64, show_inspector: &mut bool) {
 	egui::Window::new(egui::RichText::new("[DEBUG]").strong())
 		.resizable(false)

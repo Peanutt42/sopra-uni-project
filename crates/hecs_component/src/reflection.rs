@@ -1,5 +1,6 @@
 use std::any::Any;
 
+/// supported Values by the reflection system for read only
 pub enum Value<'a> {
 	Bool(bool),
 	I16(i16),
@@ -17,6 +18,7 @@ pub enum Value<'a> {
 	Enum(EnumValue),
 }
 
+/// supported Values by the reflection system for mutable write
 pub enum ValueMut<'a> {
 	Bool(&'a mut bool),
 	I16(&'a mut i16),
@@ -74,6 +76,7 @@ impl<'a> EnumValueMut<'a> {
 	}
 }
 
+/// read only visitor pattern for reflecting on components and their fields
 pub trait Visitor {
 	fn begin_component(&mut self, _type_name: &'static str, _field_count: usize) {}
 	fn end_component(&mut self, _type_name: &'static str) {}
@@ -88,6 +91,7 @@ pub trait Visitor {
 	fn visit_value(&mut self, _value: Value<'_>) {}
 }
 
+/// mutable visitor pattern for reflecting on components and their fields
 pub trait VisitorMut {
 	fn begin_component(&mut self, _type_name: &'static str, _field_count: usize) {}
 	fn end_component(&mut self, _type_name: &'static str) {}
@@ -102,11 +106,15 @@ pub trait VisitorMut {
 	fn visit_value(&mut self, _value: ValueMut<'_>) {}
 }
 
+/// trait that defines all needed functions for the runtime reflection system
 pub trait Reflect: Any {
+	/// hot-reload stable type name
 	fn type_name(&self) -> &'static str {
 		std::any::type_name::<Self>()
 	}
+	/// runs the read-only visitor
 	fn accept(&self, v: &mut dyn Visitor);
+	/// mutable version of [Self::accept]
 	fn accept_mut(&mut self, v: &mut dyn VisitorMut);
 
 	/// Visits only this value's fields, without emitting callbacks for the value
@@ -115,6 +123,7 @@ pub trait Reflect: Any {
 	fn accept_fields(&self, v: &mut dyn Visitor) {
 		self.accept(v);
 	}
+	/// mutable version of [Self::accept_fields]
 	fn accept_fields_mut(&mut self, v: &mut dyn VisitorMut) {
 		self.accept_mut(v);
 	}

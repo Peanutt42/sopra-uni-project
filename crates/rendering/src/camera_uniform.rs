@@ -1,6 +1,7 @@
 use crate::Camera;
 use cgmath::Matrix4;
 
+/// GPU memory uniform buffer for the camera
 #[repr(C)]
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct CameraUniform {

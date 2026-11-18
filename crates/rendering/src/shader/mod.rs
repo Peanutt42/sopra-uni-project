@@ -25,6 +25,8 @@ pub const INSTANCE_BUFFER_BIND_SLOT: u32 = 1;
 pub const CAMERA_UNIFORM_BIND_GROUP: u32 = 0;
 pub const LIGHT_UNIFORM_BIND_GROUP: u32 = 1;
 
+/// creates a shader pipeline based on shader source code.
+/// this is used by both static_inline and hotreload
 pub(crate) fn create_pipeline(
 	source: ShaderSource,
 	vertex_layout: VertexBufferLayout<'static>,

@@ -145,6 +145,7 @@ pub fn derive_hecs_component(input: TokenStream) -> TokenStream {
 	.into()
 }
 
+/// derive proc macro that automatically implements the [sphynx_hecs_component::reflection::Reflect] trait
 #[proc_macro_derive(Reflect)]
 pub fn derive_reflect(input: TokenStream) -> TokenStream {
 	let input = parse_macro_input!(input as DeriveInput);
@@ -227,6 +228,7 @@ pub fn derive_reflect(input: TokenStream) -> TokenStream {
 	.into()
 }
 
+/// generates [sphynx_hecs_component::reflection::Reflect] implementation for c-style enum types
 fn derive_reflect_enum(name: &syn::Ident, data: &syn::DataEnum) -> TokenStream {
 	let mut variant_names = Vec::new();
 	let mut selected_arms = Vec::new();

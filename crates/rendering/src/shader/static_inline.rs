@@ -7,27 +7,26 @@ use wgpu::{
 	VertexBufferLayout,
 };
 
-#[cfg(not(all(feature = "hot-reload", not(target_arch = "wasm32"))))]
+/// includes a wesl shader module from the specified shader package
 #[macro_export]
 macro_rules! include_shader {
 	($shader_root_dir:literal, $shader_module_name:literal, $bindings:expr, $device:expr, $swapchain_format:expr) => {{
-		$crate::Shader::from_str_instanced::<
+		$crate::include_custom_shader!(
 			$crate::vertex::PCN_Vertex,
 			$crate::instance_data::Model_InstanceData,
-		>(
-			::sphynx_wesl_include::include_wesl!($shader_root_dir, $shader_module_name),
-			Some($shader_module_name),
+			$shader_root_dir,
+			$shader_module_name,
 			$bindings,
 			$device,
-			$swapchain_format,
+			$swapchain_format
 		)
 	}};
 }
 
-#[cfg(not(all(feature = "hot-reload", not(target_arch = "wasm32"))))]
+/// same as [include_shader] but for custom Vertex and Instance datatypes
 #[macro_export]
 macro_rules! include_custom_shader {
-	($vertex:expr, $instance:expr, $shader_root_dir:expr, $shader_module_name:expr, $bindings:expr, $device:expr, $swapchain_format:expr) => {{
+	($vertex:ty, $instance:ty, $shader_root_dir:expr, $shader_module_name:expr, $bindings:expr, $device:expr, $swapchain_format:expr) => {{
 		$crate::Shader::from_str_instanced::<$vertex, $instance>(
 			::sphynx_wesl_include::include_wesl!($shader_root_dir, $shader_module_name),
 			Some($shader_module_name),
@@ -38,11 +37,13 @@ macro_rules! include_custom_shader {
 	}};
 }
 
+/// a shader based on wgsl shader code
 pub struct Shader {
 	pipeline: RenderPipeline,
 }
 
 impl Shader {
+	/// creates a shader from wgsl shader code
 	pub fn from_str<V: Vertex>(
 		shader_code: &str,
 		instance_layout: Option<VertexBufferLayout<'static>>,
@@ -62,6 +63,7 @@ impl Shader {
 		)
 	}
 
+	/// same as [Self::from_str] but with instanced with [InstanceData]
 	pub fn from_str_instanced<V: Vertex, I: InstanceData>(
 		shader_code: &str,
 		label: Option<&str>,
@@ -106,6 +108,7 @@ impl Shader {
 		Self { pipeline }
 	}
 
+	/// binds the shader to the renderpass
 	pub fn bind<'a>(&'a self, renderpass: &'_ mut RenderPass<'a>) {
 		renderpass.set_pipeline(&self.pipeline);
 	}

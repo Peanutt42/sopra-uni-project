@@ -36,6 +36,7 @@ fn clear_label_selection(ctx: &Context) {
 	}
 }
 
+/// stores all state needed to render the egui context using wgpu
 pub struct EguiRenderer {
 	state: State,
 	renderer: Renderer,
@@ -87,6 +88,7 @@ impl EguiRenderer {
 		}
 	}
 
+	/// registers when window loses focus / cursor leaves the window to clear the selection
 	pub fn handle_input(&mut self, window: &Window, event: &WindowEvent) {
 		let _ = self.state.on_window_event(window, event);
 
@@ -110,6 +112,8 @@ impl EguiRenderer {
 		self.context().set_pixels_per_point(v);
 	}
 
+	/// handles input and starts a egui frame. egui ui functions must be called after this and
+	/// before [Self::end_frame_and_draw].
 	pub fn begin_frame(&mut self) {
 		let raw_input = self.state.take_egui_input(self.window.as_ref());
 		let ctx = self.state.egui_ctx();
@@ -125,6 +129,7 @@ impl EguiRenderer {
 		self.frame_started = true;
 	}
 
+	/// this must be called after every call to [Self::begin_frame].
 	pub fn end_frame_and_draw(
 		&mut self,
 		device: &Device,

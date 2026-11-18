@@ -22,6 +22,7 @@ pub use game::GameApi;
 
 mod platform;
 
+/// all errors the engine can have (mainly while starting)
 #[derive(Debug, Error)]
 pub enum EngineError {
 	#[error("failed to create renderer: {0}")]
@@ -40,6 +41,7 @@ impl EngineConfig {
 		Self { fullscreen, vsync }
 	}
 
+	/// runs the engine with [self] configuration
 	pub fn run<G: 'static, S: 'static>(
 		self,
 		game_api: GameApi<G, S>,
@@ -56,6 +58,7 @@ impl EngineConfig {
 	}
 }
 
+/// mega object of everything the engine owns
 pub(crate) struct Engine<G, S> {
 	config: EngineConfig,
 	/// None while the window has not yet been created
@@ -118,10 +121,12 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 		})
 	}
 
+	/// runs the event loop with [self] as the [ApplicationHandler]
 	pub fn run(self, event_loop: EventLoop<()>) -> Result<(), EngineError> {
 		platform::run(self, event_loop)
 	}
 
+	/// polls the RendererInit if it has finished initializing the renderer
 	fn poll_renderer_init(&mut self) {
 		let Some(renderer_init) = self.renderer_init.as_mut() else {
 			return;
@@ -155,6 +160,7 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 		)
 	}
 
+	/// updates all subsystems and renders one frame
 	fn update(&mut self, event_loop: &ActiveEventLoop) {
 		let window = self
 			.window

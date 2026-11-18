@@ -5,6 +5,7 @@ use wgpu::{
 	TextureUsages, TextureView, TextureViewDescriptor,
 };
 
+/// stores the wgpu handles to the texture, texture view and texture sampler of the depth texture
 pub struct DepthTexture {
 	_texture: Texture,
 	view: TextureView,
@@ -53,6 +54,7 @@ impl DepthTexture {
 		}
 	}
 
+	/// the attachment clears the depth texture on load
 	pub fn get_attachment(&self) -> RenderPassDepthStencilAttachment<'_> {
 		RenderPassDepthStencilAttachment {
 			view: &self.view,

@@ -7,6 +7,8 @@ use winit::{
 	window::{Window, WindowAttributes},
 };
 
+/// starts the game's event loop, but does not block on it like native does, since wasm in the browser
+/// does not allow that
 pub fn run<G: 'static, S: 'static>(
 	engine: Engine<G, S>,
 	event_loop: EventLoop<()>,
@@ -27,6 +29,7 @@ pub struct RendererInit {
 	result: Rc<RefCell<Option<CreateRendererResult>>>,
 }
 impl RendererInit {
+	/// starts to asynchronously create the renderer
 	pub fn start(window: Arc<Window>, vsync: bool) -> Self {
 		let result = Rc::new(RefCell::new(None));
 		let task_result = Rc::clone(&result);
@@ -40,6 +43,7 @@ impl RendererInit {
 
 		Self { result }
 	}
+	/// polls for the asynchronous render creation task
 	pub fn poll(&mut self) -> Option<CreateRendererResult> {
 		self.result.borrow_mut().take()
 	}

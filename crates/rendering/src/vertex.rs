@@ -3,10 +3,14 @@ use std::hash::{Hash, Hasher};
 use sphynx_derive_vertex_attrib::Vertex;
 use wgpu::{VertexAttribute, VertexBufferLayout, vertex_attr_array};
 
+/// trait for all vertex types: must be zero-copyable to gpu memory and return their
+/// [wgpu::VertexBufferLayout]
 pub trait Vertex: bytemuck::Pod + bytemuck::Zeroable {
+	/// returns the [wgpu::VertexBufferLayout]
 	fn desc() -> VertexBufferLayout<'static>;
 }
 
+/// Position Color Normal Vertex
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable, Vertex)]
 #[allow(non_camel_case_types)]

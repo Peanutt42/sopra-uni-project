@@ -7,6 +7,7 @@ use wgpu::{
 	util::{BufferInitDescriptor, DeviceExt},
 };
 
+/// stores the wgpu buffers storing the 3D Model GPU buffer
 pub struct Mesh {
 	vertex_buffer: Buffer,
 	vertex_count: u32,
@@ -54,11 +55,13 @@ impl Mesh {
 		}
 	}
 
+	/// draws one instance using bound shader to renderpass
 	pub fn draw<'a>(&'a self, renderpass: &'_ mut RenderPass<'a>) {
 		self.bind(renderpass);
 		renderpass.draw(0..self.vertex_count, 0..1);
 	}
 
+	/// same as [Self::draw] but instanced with [InstanceData]
 	pub fn draw_instanced<'a, I: InstanceData>(
 		&'a self,
 		instance_buffer: &'a InstanceBuffer<I>,

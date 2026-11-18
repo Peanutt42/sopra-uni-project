@@ -2,6 +2,7 @@ use sphynx_core::{EngineConfig, EngineError, GameApi};
 
 use game::{Game, SerializedGame};
 
+/// entry point for all native desktop platforms (for web see ../crates/web/)
 fn main() -> Result<(), EngineError> {
 	#[cfg(feature = "hot-reload")]
 	let observer = game_lib::subscribe();

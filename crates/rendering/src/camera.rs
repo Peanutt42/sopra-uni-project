@@ -1,6 +1,8 @@
 use cgmath::{Angle, Deg, InnerSpace, Matrix4, Point3, Rad, Vector3, perspective};
 use wgpu::SurfaceConfiguration;
 
+/// represents the game's camera view
+/// TOOD: add roll
 pub struct Camera {
 	pub position: Point3<f32>,
 	pub yaw: Rad<f32>,
@@ -35,6 +37,7 @@ impl Camera {
 		}
 	}
 
+	/// combines projection and view matrix (look-at-matrix)
 	pub fn get_projection_view_matrix(&self, aspect: f32) -> Matrix4<f32> {
 		let proj = perspective(Deg(self.fov), aspect, self.z_near, self.z_far);
 
@@ -47,7 +50,8 @@ impl Camera {
 		proj * view
 	}
 
-	/// returns the aspect, if 0.0 or NaN, it returns 16.0 / 9.0 for simplicity (you won't see the result anyways, just don't panic on math)
+	/// aspect ratio with safe fallback to 16/9 on invalid width/height (for ex. when window is
+	/// minimized)
 	pub fn get_aspect(width: f32, height: f32) -> f32 {
 		let aspect = width / height;
 		if aspect.is_nan() || aspect == 0.0 {

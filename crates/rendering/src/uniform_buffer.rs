@@ -6,6 +6,8 @@ use wgpu::{
 	util::{BufferInitDescriptor, DeviceExt},
 };
 
+/// stores both the uniform buffers state of type T and the needed information to bind that buffers
+/// state to a shader
 pub struct UniformBuffer<T: bytemuck::Pod + bytemuck::Zeroable> {
 	buffer: Buffer,
 	bind_group: BindGroup,
@@ -84,10 +86,12 @@ where
 		&self.bind_group_layout
 	}
 
+	/// only actually updates when the queue is submitted with [wgpu::Queue::submit]
 	pub fn update(&self, data: T, queue: &Queue) {
 		queue.write_buffer(&self.buffer, 0, bytemuck::cast_slice(&[data]));
 	}
 
+	/// binds the uniform buffer to a shader
 	pub fn bind<'a>(&'a self, bind_group: u32, renderpass: &'_ mut RenderPass<'a>) {
 		renderpass.set_bind_group(bind_group, &self.bind_group, &[]);
 	}

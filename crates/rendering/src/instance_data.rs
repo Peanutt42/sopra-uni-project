@@ -2,10 +2,14 @@ use cgmath::{Matrix3, Matrix4};
 use sphynx_derive_vertex_attrib::InstanceData;
 use wgpu::{VertexAttribute, VertexBufferLayout, vertex_attr_array};
 
+/// trait for all InstanceData types: must be zero-copyable to gpu memory and return their
+/// [wgpu::VertexBufferLayout]
 pub trait InstanceData: bytemuck::Pod + bytemuck::Zeroable {
+	/// returns the [wgpu::VertexBufferLayout]
 	fn desc() -> VertexBufferLayout<'static>;
 }
 
+/// GPU memory buffer layout of a single instances data: both model matrix as well as rotation matrix
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable, InstanceData)]
 #[allow(non_camel_case_types)]

@@ -1,3 +1,4 @@
+/// GPU memory uniform buffer for the lighting information
 #[repr(C)]
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct LightUniform {
