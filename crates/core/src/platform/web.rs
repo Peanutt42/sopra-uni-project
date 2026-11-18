@@ -1,0 +1,50 @@
+use crate::{Engine, EngineError};
+use sphynx_rendering::{CreateRendererResult, Renderer};
+use std::{cell::RefCell, rc::Rc, sync::Arc};
+use winit::{
+	event_loop::EventLoop,
+	platform::web::{EventLoopExtWebSys, WindowAttributesExtWebSys},
+	window::{Window, WindowAttributes},
+};
+
+/// starts the game's event loop, but does not block on it like native does, since wasm in the browser
+/// does not allow that
+pub fn run<G: 'static, S: 'static>(
+	engine: Engine<G, S>,
+	event_loop: EventLoop<()>,
+) -> Result<(), EngineError> {
+	event_loop.spawn_app(engine);
+	Ok(())
+}
+
+pub fn configure_window(attributes: WindowAttributes, _fullscreen: bool) -> WindowAttributes {
+	attributes
+		.with_append(true)
+		.with_focusable(true)
+		.with_prevent_default(true)
+}
+
+/// holds reference to the result of the async task that creates the renderer
+pub struct RendererInit {
+	result: Rc<RefCell<Option<CreateRendererResult>>>,
+}
+impl RendererInit {
+	/// starts to asynchronously create the renderer
+	pub fn start(window: Arc<Window>, vsync: bool) -> Self {
+		let result = Rc::new(RefCell::new(None));
+		let task_result = Rc::clone(&result);
+		let task_window = Arc::clone(&window);
+
+		wasm_bindgen_futures::spawn_local(async move {
+			*task_result.borrow_mut() = Some(Renderer::new(Arc::clone(&task_window), vsync).await);
+			// Wake the event loop so it can install the renderer.
+			task_window.request_redraw();
+		});
+
+		Self { result }
+	}
+	/// polls for the asynchronous render creation task
+	pub fn poll(&mut self) -> Option<CreateRendererResult> {
+		self.result.borrow_mut().take()
+	}
+}

@@ -1,0 +1,28 @@
+[package]
+name = "sphynx_core"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sphynx_logging = { workspace = true }
+sphynx_input = { workspace = true }
+sphynx_rendering = { workspace = true }
+sphynx_egui = { workspace = true, optional = true }
+sphynx_hecs_component = { workspace = true }
+hecs = { workspace = true }
+thiserror = { workspace = true }
+winit = { workspace = true }
+cgmath = { workspace = true }
+hot-lib-reloader = { workspace = true, optional = true }
+web-time = "1.1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+pollster = "1.0"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen-futures = "0.4"
+
+[features]
+default = []
+egui = ["sphynx_rendering/egui", "dep:sphynx_egui"]
+hot-reload = ["dep:hot-lib-reloader", "sphynx_rendering/hot-reload"]
