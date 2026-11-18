@@ -1,8 +1,6 @@
-use camera_controller::CameraController;
-use cgmath::{Quaternion, Vector3, Zero};
 use sphynx_input::Input;
 use sphynx_logging::*;
-use sphynx_rendering::{CreateRendererError, Renderer, Transform};
+use sphynx_rendering::{CreateRendererError, Renderer};
 use std::sync::Arc;
 use thiserror::Error;
 use web_time::Instant;
@@ -14,8 +12,6 @@ use winit::{
 	keyboard::KeyCode,
 	window::{CursorGrabMode, Fullscreen, Window, WindowAttributes},
 };
-
-mod camera_controller;
 
 mod game;
 pub use game::GameApi;
@@ -35,10 +31,27 @@ pub enum EngineError {
 pub struct EngineConfig {
 	pub fullscreen: bool,
 	pub vsync: bool,
+	pub on_exiting_callback: Option<fn()>,
 }
 impl EngineConfig {
 	pub fn new(fullscreen: bool, vsync: bool) -> Self {
-		Self { fullscreen, vsync }
+		Self {
+			fullscreen,
+			vsync,
+			on_exiting_callback: None,
+		}
+	}
+
+	pub fn new_with_exiting_callback(
+		fullscreen: bool,
+		vsync: bool,
+		on_exiting_callback: fn(),
+	) -> Self {
+		Self {
+			fullscreen,
+			vsync,
+			on_exiting_callback: Some(on_exiting_callback),
+		}
 	}
 
 	/// runs the engine with [self] configuration
@@ -71,23 +84,25 @@ pub(crate) struct Engine<G, S> {
 	input: Input,
 	last_update_time: Instant,
 	frame_counter: u64,
-	camera_controller: CameraController,
 	restore_cursor_position: PhysicalPosition<f64>, // where should the captures cursor be restore to
 	game_api: GameApi<G, S>,
 	/// this is a mut ptr since it should support hot-reloading the game code -> memory layout shifts
 	game_ptr: *mut G,
 	#[cfg(feature = "hot-reload")]
 	hot_reload_observer: hot_lib_reloader::LibReloadObserver,
-	#[cfg(feature = "egui")]
+	#[cfg(any(debug_assertions, feature = "debug"))]
 	inspector_state: sphynx_egui::InspectorState,
-	#[cfg(feature = "egui")]
+	#[cfg(any(debug_assertions, feature = "debug"))]
 	show_inspector: bool,
 }
 
 #[cfg(debug_assertions)]
 const BUILD_CONFIG: &str = "Debug";
 
-#[cfg(not(debug_assertions))]
+#[cfg(all(not(debug_assertions), feature = "debug"))]
+const BUILD_CONFIG: &str = "Release (with Debug)";
+
+#[cfg(all(not(debug_assertions), not(feature = "debug")))]
 const BUILD_CONFIG: &str = "Release";
 
 impl<G: 'static, S: 'static> Engine<G, S> {
@@ -108,15 +123,14 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 			input: Input::new(),
 			last_update_time: Instant::now(),
 			frame_counter: 0,
-			camera_controller: CameraController::new(4.0, 0.005),
 			restore_cursor_position: PhysicalPosition::new(0.0, 0.0),
 			game_ptr,
 			game_api,
 			#[cfg(feature = "hot-reload")]
 			hot_reload_observer,
-			#[cfg(feature = "egui")]
+			#[cfg(any(debug_assertions, feature = "debug"))]
 			inspector_state: sphynx_egui::InspectorState::default(),
-			#[cfg(feature = "egui")]
+			#[cfg(any(debug_assertions, feature = "debug"))]
 			show_inspector: false,
 		})
 	}
@@ -185,14 +199,6 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 			}
 		}
 
-		#[cfg(target_arch = "wasm32")]
-		let _ = event_loop;
-
-		#[cfg(not(target_arch = "wasm32"))]
-		if self.input.was_key_pressed(KeyCode::Escape) {
-			event_loop.exit();
-		}
-
 		// captured cursor
 		if self.input.was_mouse_button_pressed(MouseButton::Right) {
 			self.restore_cursor_position = self.input.cursor_position;
@@ -203,21 +209,6 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 		}
 		window.set_cursor_visible(!self.input.is_mouse_button_down(MouseButton::Right));
 
-		self.camera_controller
-			.update(&self.input, &mut renderer.camera, delta_time);
-
-		renderer.instances.resize(2, Transform::default());
-		renderer.instances[0] = Transform::new(
-			Vector3::new(0.0, -1.0, 0.0),
-			Quaternion::zero(),
-			Vector3::new(100.0, 1.0, 100.0),
-		);
-		renderer.instances[1] = Transform::new(
-			Vector3::new(0.0, 0.0, 0.0),
-			Quaternion::zero(),
-			Vector3::new(0.1, 0.1, 0.1),
-		);
-
 		#[cfg(feature = "hot-reload")]
 		game::try_reload_game(
 			&self.hot_reload_observer,
@@ -225,19 +216,27 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 			&mut self.game_ptr,
 		);
 
-		unsafe { (self.game_api.update)(self.game_ptr, delta_time, self.frame_counter) };
-
-		#[cfg(feature = "egui")]
-		let (world_ptr, component_types) = unsafe {
-			(
-				(self.game_api.get_hecs_world)(self.game_ptr),
-				(self.game_api.get_component_types)(),
-			)
+		let continue_running = unsafe {
+			(self.game_api.update)(self.game_ptr, &self.input, delta_time, self.frame_counter)
 		};
 
-		renderer.update(
-			#[cfg(feature = "egui")]
-			|ctx| {
+		if !continue_running {
+			event_loop.exit();
+		}
+
+		unsafe {
+			(self.game_api.render)(self.game_ptr, renderer);
+		}
+
+		#[cfg(any(debug_assertions, feature = "debug"))]
+		let (world_ptr, component_types) = (
+			unsafe { (self.game_api.get_hecs_world)(self.game_ptr) },
+			(self.game_api.get_component_types)(),
+		);
+
+		renderer.update(|ctx| {
+			#[cfg(any(debug_assertions, feature = "debug"))]
+			{
 				sphynx_egui::debug_window(
 					ctx,
 					delta_time,
@@ -253,8 +252,10 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 						&mut self.inspector_state,
 					);
 				}
-			},
-		);
+			}
+
+			unsafe { (self.game_api.egui_render)(self.game_ptr, ctx) };
+		});
 
 		self.input.clear_frame();
 
@@ -299,7 +300,6 @@ impl<G: 'static, S: 'static> ApplicationHandler for Engine<G, S> {
 			return;
 		};
 
-		#[cfg(feature = "egui")]
 		renderer.egui_renderer.handle_input(window.as_ref(), &event);
 
 		match event {
@@ -329,6 +329,14 @@ impl<G: 'static, S: 'static> ApplicationHandler for Engine<G, S> {
 	) {
 		if let DeviceEvent::MouseMotion { delta } = event {
 			self.input.handle_mouse_movement(delta);
+		}
+	}
+
+	fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
+		info!(General, "=== SHUTDOWN ===");
+
+		if let Some(on_exiting_callback) = self.config.on_exiting_callback {
+			on_exiting_callback();
 		}
 	}
 }

@@ -1,9 +1,15 @@
+use sphynx_input::Input;
+use sphynx_rendering::Renderer;
+
 /// vtable of function ptrs for interacting with the game library without linking to the games
 /// functions directly in order to support hot-reloading the game library.
 pub struct GameApi<Game, SerializedGame> {
 	pub create: fn() -> *mut Game,
 	pub destroy: unsafe fn(game: *mut Game),
-	pub update: unsafe fn(game: *mut Game, dt: f32, frame: u64),
+	/// returns whether the game engine should continue running or shutdown
+	pub update: unsafe fn(game: *mut Game, input: &Input, dt: f32, frame: u64) -> bool,
+	pub render: unsafe fn(game: *const Game, renderer: &mut Renderer),
+	pub egui_render: unsafe fn(game: *mut Game, ctx: &egui::Context),
 	pub serialize: unsafe fn(game: *const Game) -> SerializedGame,
 	pub deserialize: fn(serialized_game: SerializedGame) -> *mut Game,
 	pub version: fn() -> u64,

@@ -11,6 +11,8 @@ fn main() -> Result<(), EngineError> {
 		create: game_lib::sphynx_engine_game_create,
 		destroy: game_lib::sphynx_engine_game_destroy,
 		update: game_lib::sphynx_engine_game_update,
+		render: game_lib::sphynx_engine_game_render,
+		egui_render: game_lib::sphynx_engine_game_egui_render,
 		serialize: game_lib::sphynx_engine_game_serialize,
 		deserialize: game_lib::sphynx_engine_game_deserialize,
 		version: game_lib::sphynx_engine_game_version,
@@ -35,6 +37,8 @@ fn main() -> Result<(), EngineError> {
 mod game_lib {
 	// needed for the proc-macro magic
 	use game::{Game, SerializedGame};
+	use sphynx_input::Input;
+	use sphynx_rendering::Renderer;
 
 	hot_functions_from_file!("game/src/hot_reload_api.rs");
 

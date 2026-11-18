@@ -1,5 +1,4 @@
 use crate::{Engine, EngineError};
-use sphynx_logging::info;
 use sphynx_rendering::{CreateRendererError, CreateRendererResult, Renderer};
 use std::sync::Arc;
 use winit::{
@@ -14,8 +13,6 @@ pub fn run<G: 'static, S: 'static>(
 ) -> Result<(), EngineError> {
 	let mut engine = engine;
 	event_loop.run_app(&mut engine)?;
-
-	info!(General, "=== SHUTDOWN ===");
 
 	Ok(())
 }

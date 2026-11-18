@@ -13,6 +13,8 @@ mod uniform_buffer;
 mod vertex;
 
 pub use camera::Camera;
+pub use camera_uniform::CameraUniform;
+pub use lighting::LightUniform;
 pub use mesh::Mesh;
 pub use model::load_obj_model;
 pub use renderer::{CreateRendererError, CreateRendererResult, Renderer};
