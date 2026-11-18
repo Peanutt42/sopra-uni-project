@@ -4,6 +4,41 @@
 
 My own custom game engine written in rust using `wgpu` Graphics API and a ECS (Entity-Component-System) Architecture.
 
+### How to compile / what dependencies and tools are needed
+
+#### Using Nix (install nix the package manager at <https://nixos.org/download/>)
+
+The easiest and fastest way to compiling on linux is using the provided `flake.nix`:
+```bash
+nix build .
+```
+
+For development, the `flake.nix` provides a devShell:
+```bash
+nix develop # or run direnv allow if you have direnv installed
+```
+
+#### Manual compiling
+
+Dependencies for compiling:
+- cargo and rustc: 1.97.1 or newer, latest stable or nightly works  (nightly is required for faster dev builds using `./.cargo/fast_dev_config.toml`, i test on `rustc 1.101.0-nightly`)
+- pkgconfig
+
+Runtime dependencies:
+- wayland
+- libxkbcommon
+- vulkan-loader
+- libx11
+- libxcursor
+- libxrandr
+- libxi
+
+Optional dev dependencies (not at all needed if you dont intend on using them):
+- mold
+- parallel
+- wgsl-analyzer
+- sccache
+
 ### Available commands for fast development (justfile)
 
 ```bash
