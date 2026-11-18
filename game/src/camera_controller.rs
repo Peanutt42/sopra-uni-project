@@ -1,12 +1,14 @@
 use cgmath::Rad;
+use serde::{Deserialize, Serialize};
 use sphynx_input::Input;
+use sphynx_input::{KeyCode, MouseButton};
 use sphynx_rendering::Camera;
-use winit::{event::MouseButton, keyboard::KeyCode};
 
 use std::f32::consts::FRAC_PI_2;
 const SAFE_FRAC_PI_2: f32 = FRAC_PI_2 - f32::EPSILON;
 
 /// Debug free-fly camera controller
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct CameraController {
 	speed: f32,
 	sensitivity: f32,

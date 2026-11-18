@@ -12,8 +12,14 @@ crate-type = ["rlib", "cdylib"]
 hecs = { workspace = true }
 sphynx_logging = { workspace = true }
 sphynx_hecs_component = { workspace = true }
+sphynx_input = { workspace = true }
+sphynx_rendering = { workspace = true }
 serde = { workspace = true }
+serde_json = { workspace = true }
+egui = { workspace = true }
+cgmath-next = { workspace = true }
 
 [features]
 default = []
-hot-reload = []
+hot-reload = ["sphynx_rendering/hot-reload"]
+debug = ["sphynx_rendering/debug"]

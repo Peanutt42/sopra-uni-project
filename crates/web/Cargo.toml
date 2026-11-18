@@ -15,4 +15,4 @@ web-sys = { version = "0.3", features = ["Document", "Element", "Window"] }
 
 [features]
 default = []
-egui = ["sphynx_core/egui"]
+debug = ["sphynx_core/debug", "game/debug"]
