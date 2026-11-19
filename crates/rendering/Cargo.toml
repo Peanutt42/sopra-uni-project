@@ -8,13 +8,14 @@ sphynx_logging = { workspace = true }
 sphynx_derive_vertex_attrib = { workspace = true }
 sphynx_wesl_include = { workspace = true }
 sphynx_wesl = { workspace = true, optional = true }
-sphynx_egui = { workspace = true, optional = true }
+sphynx_egui = { workspace = true }
 winit = { workspace = true }
 wgpu = { workspace = true }
 thiserror = { workspace = true }
-cgmath = { workspace = true }
+cgmath-next = { workspace = true }
 bytemuck = { workspace = true }
 wavefront = { workspace = true }
+serde = { workspace = true }
 notify-debouncer-full = { version = "0.7.0", optional = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
@@ -22,5 +23,5 @@ wgpu = { workspace = true, features = ["webgpu", "webgl"] }
 
 [features]
 default = []
-egui = ["dep:sphynx_egui"]
 hot-reload = ["dep:sphynx_wesl", "dep:notify-debouncer-full"]
+debug = ["sphynx_egui/debug"]

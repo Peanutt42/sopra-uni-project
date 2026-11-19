@@ -2,9 +2,10 @@ use cgmath::{Vector2, Zero};
 use std::collections::HashMap;
 use winit::{
 	dpi::PhysicalPosition,
-	event::{ElementState, KeyEvent, MouseButton},
-	keyboard::{KeyCode, PhysicalKey},
+	event::{ElementState, KeyEvent},
+	keyboard::PhysicalKey,
 };
+pub use winit::{event::MouseButton, keyboard::KeyCode};
 
 /// stores all information needed for input handling. also stores information to detect when keys
 /// are pressed down (compared to holding a key down)

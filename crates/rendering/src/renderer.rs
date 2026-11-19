@@ -10,7 +10,6 @@ use crate::{
 	shader::{CAMERA_UNIFORM_BIND_GROUP, LIGHT_UNIFORM_BIND_GROUP},
 	uniform_buffer::UniformBuffer,
 };
-#[cfg(feature = "egui")]
 use sphynx_egui::EguiRenderer;
 #[cfg(target_arch = "wasm32")]
 use sphynx_logging::warning;
@@ -53,7 +52,7 @@ pub struct Renderer {
 	window: Arc<Window>,
 	device: Device,
 	queue: Queue,
-	swapchain_config: SurfaceConfiguration,
+	pub swapchain_config: SurfaceConfiguration,
 	/// the TextureFormat that we view the swapchain texture with (should always be sRGB, even when
 	/// the underlying swapchain texture is not sRGB!)
 	swapchain_texture_view_format: TextureFormat,
@@ -64,12 +63,12 @@ pub struct Renderer {
 
 	pub instances: Vec<Transform>,
 
+	pub light_uniform: LightUniform,
 	light_uniform_buffer: UniformBuffer<LightUniform>,
 
-	pub camera: Camera,
+	pub camera_uniform: CameraUniform,
 	camera_uniform_buffer: UniformBuffer<CameraUniform>,
 
-	#[cfg(feature = "egui")]
 	pub egui_renderer: EguiRenderer,
 }
 
@@ -206,9 +205,8 @@ impl Renderer {
 		let cube_instance_buffer = InstanceBuffer::new(raw_instance_data, &device);
 		instances.clear();
 
-		let camera = Camera::default();
 		let camera_uniform = CameraUniform::from_camera(
-			&camera,
+			&Camera::default(),
 			Camera::get_aspect_from_swapchain(&swapchain_config),
 		);
 		let camera_uniform_buffer = UniformBuffer::for_vertex_and_fragment(
@@ -217,7 +215,7 @@ impl Renderer {
 			&device,
 		);
 
-		let light_uniform = LightUniform::new([0.0, 0.0, 0.0], [0.5, 0.5, 0.5]);
+		let light_uniform = LightUniform::new([0.0, 0.0, 0.0], [0.0, 0.0, 0.0]);
 		let light_uniform_buffer =
 			UniformBuffer::for_fragment(light_uniform, Some("LightUniformBuffer"), &device);
 
@@ -232,7 +230,6 @@ impl Renderer {
 			swapchain_texture_view_format
 		);
 
-		#[cfg(feature = "egui")]
 		let egui_renderer = EguiRenderer::new(
 			&device,
 			swapchain_texture_view_format,
@@ -253,11 +250,11 @@ impl Renderer {
 			default_shader,
 			cube_mesh,
 			cube_instance_buffer,
-			camera,
+			camera_uniform,
 			camera_uniform_buffer,
+			light_uniform,
 			light_uniform_buffer,
 			instances,
-			#[cfg(feature = "egui")]
 			egui_renderer,
 		})
 	}
@@ -279,10 +276,7 @@ impl Renderer {
 	}
 
 	/// renders a new frame
-	pub fn update(
-		&mut self,
-		#[cfg(feature = "egui")] egui_callback: impl FnOnce(&sphynx_egui::egui::Context),
-	) {
+	pub fn update(&mut self, egui_callback: impl FnOnce(&sphynx_egui::egui::Context)) {
 		let surface_texture = match self.surface.get_current_texture() {
 			CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
 			CurrentSurfaceTexture::Lost | CurrentSurfaceTexture::Outdated => {
@@ -319,13 +313,11 @@ impl Renderer {
 			.collect::<Vec<_>>();
 		self.cube_instance_buffer.update(&self.queue);
 
-		self.camera_uniform_buffer.update(
-			CameraUniform::from_camera(
-				&self.camera,
-				Camera::get_aspect_from_swapchain(&self.swapchain_config),
-			),
-			&self.queue,
-		);
+		self.camera_uniform_buffer
+			.update(self.camera_uniform, &self.queue);
+
+		self.light_uniform_buffer
+			.update(self.light_uniform, &self.queue);
 
 		let mut encoder = self
 			.device
@@ -360,24 +352,21 @@ impl Renderer {
 		}
 		encoder.pop_debug_group();
 
-		#[cfg(feature = "egui")]
+		encoder.push_debug_group("egui renderer");
 		{
-			encoder.push_debug_group("egui renderer");
-			{
-				self.egui_renderer.begin_frame();
+			self.egui_renderer.begin_frame();
 
-				egui_callback(self.egui_renderer.context());
+			egui_callback(self.egui_renderer.context());
 
-				self.egui_renderer.end_frame_and_draw(
-					&self.device,
-					&self.queue,
-					&mut encoder,
-					&surface_texture_view,
-					&self.swapchain_config,
-				);
-			}
-			encoder.pop_debug_group();
+			self.egui_renderer.end_frame_and_draw(
+				&self.device,
+				&self.queue,
+				&mut encoder,
+				&surface_texture_view,
+				&self.swapchain_config,
+			);
 		}
+		encoder.pop_debug_group();
 
 		self.queue.submit(Some(encoder.finish()));
 		self.queue.present(surface_texture);
