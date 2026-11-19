@@ -6,17 +6,19 @@ edition = "2024"
 [dependencies]
 sphynx_core = { workspace = true }
 sphynx_logging = { workspace = true }
+sphynx_input = { workspace = true }
+sphynx_rendering = { workspace = true }
 sphynx_hecs_component = { workspace = true }
 sphynx_hecs_component_derive = { workspace = true }
-
+egui = { workspace = true }
 hecs = { workspace = true }
 hot-lib-reloader = { workspace = true, optional = true }
 game = { path = "game" }
 
 [features]
 default = []
-hot-reload = ["sphynx_core/hot-reload", "game/hot-reload", "dep:hot-lib-reloader"]
-egui = ["sphynx_core/egui"]
+hot-reload = ["sphynx_core/hot-reload", "sphynx_rendering/hot-reload", "game/hot-reload", "dep:hot-lib-reloader"]
+debug = ["sphynx_core/debug", "sphynx_rendering/debug", "game/debug"]
 
 [workspace]
 members = [
@@ -50,7 +52,7 @@ sphynx_wesl = { path = "crates/wesl" }
 thiserror = "2.0"
 winit = "0.30.13"
 wgpu = "30.0.1"
-cgmath = "0.18"
+cgmath-next = { version = "0.18", features = ["serde"] }
 bytemuck = { version = "1.25", features = ["derive"] }
 wavefront = { version = "0.2.3"}
 hecs = "0.11"
@@ -59,3 +61,4 @@ serde_json = "1.0"
 hot-lib-reloader = "0.8.2"
 quote = "1.0"
 syn = { version = "3", features = ["derive", "parsing"] }
+egui = { version = "0.37.0", features = ["default_fonts", "serde"] }

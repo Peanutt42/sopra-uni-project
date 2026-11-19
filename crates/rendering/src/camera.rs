@@ -1,8 +1,10 @@
 use cgmath::{Angle, Deg, InnerSpace, Matrix4, Point3, Rad, Vector3, perspective};
+use serde::{Deserialize, Serialize};
 use wgpu::SurfaceConfiguration;
 
 /// represents the game's camera view
 /// TOOD: add roll
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Camera {
 	pub position: Point3<f32>,
 	pub yaw: Rad<f32>,

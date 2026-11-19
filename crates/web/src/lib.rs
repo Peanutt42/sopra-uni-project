@@ -14,6 +14,8 @@ mod browser {
 			create: game::hot_reload_api::sphynx_engine_game_create,
 			destroy: game::hot_reload_api::sphynx_engine_game_destroy,
 			update: game::hot_reload_api::sphynx_engine_game_update,
+			render: game::hot_reload_api::sphynx_engine_game_render,
+			egui_render: game::hot_reload_api::sphynx_engine_game_egui_render,
 			serialize: game::hot_reload_api::sphynx_engine_game_serialize,
 			deserialize: game::hot_reload_api::sphynx_engine_game_deserialize,
 			version: game::hot_reload_api::sphynx_engine_game_version,
@@ -21,7 +23,7 @@ mod browser {
 			get_component_types: game::hot_reload_api::sphynx_engine_game_get_component_types,
 		};
 
-		EngineConfig::new(false, true)
+		EngineConfig::new_with_exiting_callback(false, true, on_exiting_callback)
 			.run(game_api)
 			.map_err(|error| JsValue::from_str(&format!("{error:#}")))
 	}
@@ -32,6 +34,12 @@ mod browser {
 			.and_then(|document| document.get_element_by_id("loading"))
 		{
 			let _ = loading.set_attribute("hidden", "");
+		}
+	}
+
+	fn on_exiting_callback() {
+		if let Some(window) = web_sys::window() {
+			let _ = window.close();
 		}
 	}
 }

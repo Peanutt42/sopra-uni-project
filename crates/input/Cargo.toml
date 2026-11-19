@@ -5,4 +5,4 @@ edition = "2024"
 
 [dependencies]
 winit = { workspace = true }
-cgmath = { workspace = true }
+cgmath-next = { workspace = true }

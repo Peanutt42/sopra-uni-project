@@ -57,6 +57,6 @@ Available recipes:
 ```
 
 > [!NOTE]
-> When running with the `hot-reload` feature, make sure you have ran `cargo b -p game --features hot-reload` before
-> (the `libgame.so` needed by the `hot-reload` feature is only build when explicitly requesting it)
+> When running the game manually without the justfile with the `hot-reload` feature enabled, make sure you have ran `cargo b -p game --features hot-reload` before
+> (the `libgame.so` needed by the `hot-reload` feature is only build when explicitly requesting it. the justfile commands to automatically request it)
 
