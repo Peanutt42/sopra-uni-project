@@ -42,7 +42,8 @@ impl StartScreen {
 	}
 
 	pub fn render(&self, renderer: &mut Renderer) {
-		renderer.instances.clear();
+		renderer.cube_instances.clear();
+		renderer.ship_instances.clear();
 	}
 
 	pub fn egui_render(&mut self, ctx: &egui::Context) {

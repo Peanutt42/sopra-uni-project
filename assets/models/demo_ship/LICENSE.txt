@@ -1,0 +1,17 @@
+FILES:
+all files in this demo_ship directory
+
+ORIGINAL_FILE_FORMAT:
+FBX -> OBJ/MTL
+
+SOURCE:
+https://sketchfab.com/3d-models/c-201-cruiser-ship-model-2fe769d7f7294f428b362ba17a1d70f2
+
+MODIFIED:
+- decimated areas with high amount of vertices where detail was not needed
+- recalculated normals
+- re-exported as a .obj wavefront file
+(the blender file these modifications where done in is demo_ship.blend)
+
+ATTRIBUTION:
+"C-201 Cruiser Ship Model" (https://skfb.ly/oYSpo) by MIDNIGHT_WARFARE is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
