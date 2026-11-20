@@ -1,5 +1,6 @@
 #![allow(clippy::not_unsafe_ptr_arg_deref)]
 
+use cgmath::{Deg, Point3};
 use sphynx_input::Input;
 use sphynx_rendering::{Camera, CameraUniform, Renderer};
 
@@ -42,7 +43,14 @@ pub fn game_create() -> Game {
 		world,
 		spawn_counter: 0,
 		screen: Screen::default(),
-		camera: Camera::default(),
+		camera: Camera::new(
+			Point3::new(0.0, 5.0, 20.0),
+			Deg(-90.0).into(),
+			Deg(0.0).into(),
+			90.0,
+			0.1,
+			1000.0,
+		),
 		camera_controller: CameraController::new(4.0, 0.005),
 	}
 }

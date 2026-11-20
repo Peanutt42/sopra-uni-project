@@ -14,7 +14,7 @@ wgpu = { workspace = true }
 thiserror = { workspace = true }
 cgmath-next = { workspace = true }
 bytemuck = { workspace = true }
-wavefront = { workspace = true }
+tobj = { version = "4.0.5", default-features = false }
 serde = { workspace = true }
 notify-debouncer-full = { version = "0.7.0", optional = true }
 

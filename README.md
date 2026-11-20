@@ -1,5 +1,7 @@
 # Sopra versenken - Ship happens (hennig-peter)
 
+All third-party licenses are listed in [assets/LICENSES.md](./assets/LICENSES.md).
+
 ## SphynxEngine
 
 My own custom game engine written in rust using `wgpu` Graphics API and a ECS (Entity-Component-System) Architecture.
