@@ -94,6 +94,7 @@ pub(crate) struct Engine<G, S> {
 	inspector_state: sphynx_egui::InspectorState,
 	#[cfg(any(debug_assertions, feature = "debug"))]
 	show_inspector: bool,
+	elapsed_seconds: f32,
 }
 
 #[cfg(debug_assertions)]
@@ -132,6 +133,7 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 			inspector_state: sphynx_egui::InspectorState::default(),
 			#[cfg(any(debug_assertions, feature = "debug"))]
 			show_inspector: false,
+			elapsed_seconds: 0.0,
 		})
 	}
 
@@ -188,6 +190,7 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 		let now = Instant::now();
 		let delta_time = (now - self.last_update_time).as_secs_f32();
 		self.last_update_time = now;
+		self.elapsed_seconds += delta_time;
 
 		if self.input.was_key_pressed(KeyCode::F11) {
 			if self.config.fullscreen {
@@ -234,7 +237,7 @@ impl<G: 'static, S: 'static> Engine<G, S> {
 			(self.game_api.get_component_types)(),
 		);
 
-		renderer.update(|ctx| {
+		renderer.update(delta_time, |ctx| {
 			#[cfg(any(debug_assertions, feature = "debug"))]
 			{
 				sphynx_egui::debug_window(

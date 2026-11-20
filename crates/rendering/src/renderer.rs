@@ -1,5 +1,5 @@
 use crate::{
-	Camera, Mesh, Shader, Transform,
+	Camera, Mesh, Shader, Transform, Water,
 	camera_uniform::CameraUniform,
 	depth_texture::DepthTexture,
 	include_model, include_shader,
@@ -38,7 +38,7 @@ pub enum CreateRendererError {
 	#[error("failed to get surface config")]
 	FailedToGetSurfaceConfig,
 	#[error("failed to load model file: {0}")]
-	FailedToLoadModelFile(#[from] wavefront::Error),
+	FailedToLoadModelFile(#[from] tobj::LoadError),
 	#[cfg(target_arch = "wasm32")]
 	#[error("failed to initialize WebGPU or the WebGL2 fallback: {0}")]
 	FailedToInitializeWGPUOrWebGL2(Box<CreateRendererError>),
@@ -59,9 +59,14 @@ pub struct Renderer {
 	depth_texture: DepthTexture,
 	default_shader: Shader,
 	cube_mesh: Mesh,
+	pub cube_instances: Vec<Transform>,
 	cube_instance_buffer: InstanceBuffer<Model_InstanceData>,
 
-	pub instances: Vec<Transform>,
+	pub ship_instances: Vec<Transform>,
+	ship_instance_buffer: InstanceBuffer<Model_InstanceData>,
+	ship: Mesh,
+
+	water: Water,
 
 	pub light_uniform: LightUniform,
 	light_uniform_buffer: UniformBuffer<LightUniform>,
@@ -73,7 +78,8 @@ pub struct Renderer {
 }
 
 impl Renderer {
-	pub const MAX_INSTANCES: usize = 100;
+	pub const MAX_CUBE_INSTANCES: usize = 50 * 50;
+	pub const MAX_SHIP_INSTANCES: usize = 2;
 
 	pub async fn new(window: Arc<Window>, vsync: bool) -> CreateRendererResult {
 		#[cfg(target_arch = "wasm32")]
@@ -195,7 +201,7 @@ impl Renderer {
 
 		let cube_mesh = include_model!("../../../assets/models/cube.obj", &device)?; //Mesh::with_vertices(CUBE_VERTICES, Some(CUBE_INDICIES), &device);
 
-		let mut instances: Vec<Transform> = (0..Self::MAX_INSTANCES)
+		let mut instances: Vec<Transform> = (0..Self::MAX_CUBE_INSTANCES)
 			.map(|_| Transform::default())
 			.collect::<_>();
 		let raw_instance_data = instances
@@ -230,6 +236,21 @@ impl Renderer {
 			swapchain_texture_view_format
 		);
 
+		let ship_instances = vec![Transform::default(); Self::MAX_SHIP_INSTANCES];
+		let ship_instance_data = ship_instances
+			.iter()
+			.map(|t| t.to_model_instance_data())
+			.collect();
+		let ship_instance_buffer = InstanceBuffer::new(ship_instance_data, &device);
+		let ship = include_model!("../../../assets/models/demo_ship/demo_ship.obj", &device)?;
+
+		let water = Water::new(
+			&device,
+			swapchain_texture_view_format,
+			camera_uniform_buffer.get_binding(),
+			light_uniform_buffer.get_binding(),
+		);
+
 		let egui_renderer = EguiRenderer::new(
 			&device,
 			swapchain_texture_view_format,
@@ -252,9 +273,13 @@ impl Renderer {
 			cube_instance_buffer,
 			camera_uniform,
 			camera_uniform_buffer,
+			water,
+			ship_instances,
+			ship_instance_buffer,
+			ship,
 			light_uniform,
 			light_uniform_buffer,
-			instances,
+			cube_instances: instances,
 			egui_renderer,
 		})
 	}
@@ -276,7 +301,11 @@ impl Renderer {
 	}
 
 	/// renders a new frame
-	pub fn update(&mut self, egui_callback: impl FnOnce(&sphynx_egui::egui::Context)) {
+	pub fn update(
+		&mut self,
+		delta_time: f32,
+		egui_callback: impl FnOnce(&sphynx_egui::egui::Context),
+	) {
 		let surface_texture = match self.surface.get_current_texture() {
 			CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
 			CurrentSurfaceTexture::Lost | CurrentSurfaceTexture::Outdated => {
@@ -307,7 +336,7 @@ impl Renderer {
 		});
 
 		self.cube_instance_buffer.instances = self
-			.instances
+			.cube_instances
 			.iter()
 			.map(|instance| instance.to_model_instance_data())
 			.collect::<Vec<_>>();
@@ -318,6 +347,15 @@ impl Renderer {
 
 		self.light_uniform_buffer
 			.update(self.light_uniform, &self.queue);
+
+		self.ship_instance_buffer.instances = self
+			.ship_instances
+			.iter()
+			.map(Transform::to_model_instance_data)
+			.collect();
+		self.ship_instance_buffer.update(&self.queue);
+
+		self.water.update(delta_time, &self.queue);
 
 		let mut encoder = self
 			.device
@@ -349,6 +387,11 @@ impl Renderer {
 			self.default_shader.bind(&mut rpass);
 			self.cube_mesh
 				.draw_instanced(&self.cube_instance_buffer, &mut rpass);
+
+			self.ship
+				.draw_instanced(&self.ship_instance_buffer, &mut rpass);
+
+			self.water.draw(&mut rpass);
 		}
 		encoder.pop_debug_group();
 

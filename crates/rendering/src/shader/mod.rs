@@ -24,6 +24,7 @@ pub const VERTEX_BUFFER_BIND_SLOT: u32 = 0;
 pub const INSTANCE_BUFFER_BIND_SLOT: u32 = 1;
 pub const CAMERA_UNIFORM_BIND_GROUP: u32 = 0;
 pub const LIGHT_UNIFORM_BIND_GROUP: u32 = 1;
+pub const WATER_TIME_BIND_GROUP: u32 = 2;
 
 /// creates a shader pipeline based on shader source code.
 /// this is used by both static_inline and hotreload
