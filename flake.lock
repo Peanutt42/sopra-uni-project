@@ -1,5 +1,20 @@
 {
   "nodes": {
+    "codebook-nix": {
+      "locked": {
+        "lastModified": 1795703370,
+        "narHash": "sha256-Hr22iptQ0mDJhq6eA6yNKo/2x0JIMF6+DCMEFOKetbk=",
+        "owner": "Peanutt42",
+        "repo": "codebook-nix",
+        "rev": "32660890f2c655c71bd4c74830b12f02c54930e4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Peanutt42",
+        "repo": "codebook-nix",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -36,6 +51,7 @@
     },
     "root": {
       "inputs": {
+        "codebook-nix": "codebook-nix",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
         "rust-overlay": "rust-overlay",

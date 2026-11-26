@@ -48,10 +48,12 @@ $ just --list
 Available recipes:
     build-web *extra_args                   # Build the web crate bundle into web/dist
     check                                   # Run all checks/tests
+    check-dev *extra_cargo_args             # Runs clippy on the entire project using the fast dev cargo configuration (mold linker + cranelift codegen-backend)
     check-dev-all *extra_cargo_args         # Runs clippy on the entire project with every possible feature combination (requires cargo-hack)
     check-formatting                        # Checks formatting of entire rust code and errors on incorrect formatting
+    check-typos                             # Check for typos using codebook (needs to be installed)
     check-web *extra_args                   # Run clippy on the entire project using the wasm target
-    check-web-all *extra_args               # Run clippy on the entire project with every possible feature combination (execpt for hot-reload which is unsupported) using the wasm target. requires cargo-hack
+    check-web-all *extra_args               # Run clippy on the entire project with every possible feature combination (except for hot-reload which is unsupported) using the wasm target. requires cargo-hack
     default                                 # List all commands available
     run-dev-hotreloadable *extra_cargo_args # Runs the game/engine with hot-reload enabled, will rebuild the game lib when change is detected
     serve-web *extra_args                   # Serve web on http://localhost:8080
@@ -75,4 +77,11 @@ How to run checks/tests on entire project: (both clippy warnings and tests, both
 
 ```bash
 nix flake check
+```
+
+
+How to run typo checking standalone (already runs in `nix flake check`):
+
+```bash
+codebook-lsp lint . # or run "just check-typos"
 ```

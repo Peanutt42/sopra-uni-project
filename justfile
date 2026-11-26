@@ -5,9 +5,18 @@ default:
 # Run all checks/tests
 check:
 	just check-formatting
+	just check-typos
 	just check-dev-all
 	just test-dev-all
 	just check-web-all
+
+# Check for typos using codebook (needs to be installed)
+check-typos:
+	codebook-lsp lint .
+
+# Runs clippy on the entire project using the fast dev cargo configuration (mold linker + cranelift codegen-backend)
+check-dev *extra_cargo_args:
+	cargo clippy --all --features hot-reload --config ./.cargo/fast_dev_config.toml {{extra_cargo_args}}
 
 # Checks formatting of entire rust code and errors on incorrect formatting
 check-formatting:
@@ -23,7 +32,7 @@ test-dev-all *extra_cargo_args:
 
 # Runs the game/engine with hot-reload enabled, will rebuild the game lib when change is detected
 run-dev-hotreloadable *extra_cargo_args:
-	@# the game engine loads the libgame.so at start, but cargo does not compile the libgame.so if not explicitely requested
+	@# the game engine loads the libgame.so at start, but cargo does not compile the libgame.so if not explicitly requested
 	cargo build -p game --config ./.cargo/fast_dev_config.toml --features hot-reload --color always {{extra_cargo_args}}
 
 	@# runs both the game and the file watcher to rebuild libgame.so for hot-reloading. cargo watch with --postpone simply only starts recompiling after a file changed,
@@ -44,6 +53,6 @@ serve-web *extra_args:
 check-web *extra_args:
     cargo clippy --all --target wasm32-unknown-unknown {{extra_args}}
 
-# Run clippy on the entire project with every possible feature combination (execpt for hot-reload which is unsupported) using the wasm target. requires cargo-hack
+# Run clippy on the entire project with every possible feature combination (except for hot-reload which is unsupported) using the wasm target. requires cargo-hack
 check-web-all *extra_args:
 	cargo hack --feature-powerset --all --exclude-features hot-reload clippy --target wasm32-unknown-unknown {{extra_args}}

@@ -44,12 +44,12 @@ fn vs_main(vertex: PCN_Vertex, instance: InstanceData) -> VertexOutput {
 @fragment
 fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
 	// TODO: add material system
-	let metalic = 0.4; //0.8;
+	let metallic = 0.4; //0.8;
 	let roughness = 0.25; //0.2;
 
 	// calculate reflectance at normal incidence; if dia-electric (like plastic) use f0
 	// of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)
-	let f0 = mix(vec3<f32>(0.04), input.color, metalic);
+	let f0 = mix(vec3<f32>(0.04), input.color, metallic);
 
 	// for multiple lights, start at 0.0 and add all together
 	let lo = light_equation(
@@ -59,7 +59,7 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
 		input.world_position,
 		input.color,
 		input.world_normal,
-		metalic,
+		metallic,
 		roughness,
 	);
 

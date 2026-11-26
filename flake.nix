@@ -12,6 +12,8 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # on my personal Github Repo, just a flake so that nix can run codebook in checkPhase without needing networking access to download the dictionaries
+    codebook-nix.url = "github:Peanutt42/codebook-nix";
   };
 
   outputs =
@@ -21,6 +23,7 @@
       rust-overlay,
       flake-utils,
       treefmt-nix,
+      codebook-nix,
     }:
     let
       inherit (nixpkgs) lib;
@@ -183,6 +186,11 @@
         checks.${pname} = pkgs.${pname};
 
         checks.formatting = treefmtEval.config.build.check self;
+
+        checks.codebook = codebook-nix.lib.mkCodebookCheck {
+          inherit pkgs;
+          src = self;
+        };
       }
     );
 }

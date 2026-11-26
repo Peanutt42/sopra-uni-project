@@ -14,7 +14,7 @@ pub mod ui;
 mod camera_controller;
 pub use camera_controller::CameraController;
 
-/// Just to verify if hot-reload actually happend
+/// Just to verify if hot-reload actually happened
 pub const VERSION: u64 = 1;
 
 /// Stores the games state

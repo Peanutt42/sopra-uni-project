@@ -199,7 +199,7 @@ impl Renderer {
 
 		let depth_texture = DepthTexture::new(&device, &swapchain_config);
 
-		let cube_mesh = include_model!("../../../assets/models/cube.obj", &device)?; //Mesh::with_vertices(CUBE_VERTICES, Some(CUBE_INDICIES), &device);
+		let cube_mesh = include_model!("../../../assets/models/cube.obj", &device)?; //Mesh::with_vertices(CUBE_VERTICES, Some(CUBE_INDICES), &device);
 
 		let mut instances: Vec<Transform> = (0..Self::MAX_CUBE_INSTANCES)
 			.map(|_| Transform::default())

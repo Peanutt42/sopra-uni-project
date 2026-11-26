@@ -122,7 +122,7 @@ pub fn sphynx_engine_game_deserialize(serialized_game: SerializedGame) -> *mut G
 	Box::into_raw(Box::new(game))
 }
 
-/// simply for verifying if the hot-reload was successfull
+/// simply for verifying if the hot-reload was successful
 #[cfg_attr(feature = "hot-reload", unsafe(no_mangle))]
 pub fn sphynx_engine_game_version() -> u64 {
 	crate::VERSION

@@ -40,10 +40,10 @@ impl Mesh {
 			usage: BufferUsages::VERTEX,
 		});
 
-		let index_buffer = indices.map(|indicies| {
+		let index_buffer = indices.map(|indices| {
 			device.create_buffer_init(&BufferInitDescriptor {
 				label: Some("Index Buffer"),
-				contents: bytemuck::cast_slice(indicies),
+				contents: bytemuck::cast_slice(indices),
 				usage: BufferUsages::INDEX,
 			})
 		});

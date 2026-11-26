@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use wgpu::SurfaceConfiguration;
 
 /// represents the game's camera view
-/// TOOD: add roll
+/// TODO: add roll
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Camera {
 	pub position: Point3<f32>,

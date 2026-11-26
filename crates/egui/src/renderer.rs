@@ -140,7 +140,7 @@ impl EguiRenderer {
 		self.state
 			.handle_platform_output(self.window.as_ref(), full_output.platform_output);
 
-		let tris = self
+		let clipped_primitives = self
 			.state
 			.egui_ctx()
 			.tessellate(full_output.shapes, self.state.egui_ctx().pixels_per_point());
@@ -153,8 +153,13 @@ impl EguiRenderer {
 			}
 		}
 
-		self.renderer
-			.update_buffers(device, queue, encoder, &tris, &screen_descriptor);
+		self.renderer.update_buffers(
+			device,
+			queue,
+			encoder,
+			&clipped_primitives,
+			&screen_descriptor,
+		);
 
 		let rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
 			color_attachments: &[Some(wgpu::RenderPassColorAttachment {
@@ -173,8 +178,11 @@ impl EguiRenderer {
 			multiview_mask: None,
 		});
 
-		self.renderer
-			.render(&mut rpass.forget_lifetime(), &tris, &screen_descriptor);
+		self.renderer.render(
+			&mut rpass.forget_lifetime(),
+			&clipped_primitives,
+			&screen_descriptor,
+		);
 
 		for x in full_output.textures_delta.free.iter() {
 			self.renderer.free_texture(x)
