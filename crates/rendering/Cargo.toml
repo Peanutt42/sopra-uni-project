@@ -25,3 +25,6 @@ wgpu = { workspace = true, features = ["webgpu", "webgl"] }
 default = []
 hot-reload = ["dep:sphynx_wesl", "dep:notify-debouncer-full"]
 debug = ["sphynx_egui/debug"]
+
+[lints]
+workspace = true

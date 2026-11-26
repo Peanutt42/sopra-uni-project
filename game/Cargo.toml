@@ -23,3 +23,6 @@ cgmath-next = { workspace = true }
 default = []
 hot-reload = ["sphynx_rendering/hot-reload"]
 debug = ["sphynx_rendering/debug"]
+
+[lints]
+workspace = true

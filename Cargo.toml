@@ -20,6 +20,9 @@ default = []
 hot-reload = ["sphynx_core/hot-reload", "sphynx_rendering/hot-reload", "game/hot-reload", "dep:hot-lib-reloader"]
 debug = ["sphynx_core/debug", "sphynx_rendering/debug", "game/debug"]
 
+[lints]
+workspace = true
+
 [workspace]
 members = [
 	"crates/core",
@@ -61,3 +64,12 @@ hot-lib-reloader = "0.8.2"
 quote = "1.0"
 syn = { version = "3", features = ["derive", "parsing"] }
 egui = { version = "0.37.0", features = ["default_fonts", "serde"] }
+
+# basically errors-on-warnings, but requires every member crate to have
+# [lints]
+# workspace = true
+# in order to actually apply
+[workspace.lints.rust]
+warnings = "deny"
+[workspace.lints.clippy]
+all = "deny"

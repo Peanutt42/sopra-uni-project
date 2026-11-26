@@ -1,0 +1,15 @@
+stages:
+  - check
+
+variables:
+  # nix flakes are technically still experimental...
+  NIX_CONFIG: "experimental-features = nix-command flakes"
+
+default:
+  image: nixos/nix:latest
+  interruptible: true
+
+check:
+  stage: check
+  script:
+    - nix flake check

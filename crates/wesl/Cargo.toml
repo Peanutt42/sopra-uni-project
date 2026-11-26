@@ -5,3 +5,6 @@ edition = "2024"
 
 [dependencies]
 wesl = "0.6"
+
+[lints]
+workspace = true

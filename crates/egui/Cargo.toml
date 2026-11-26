@@ -20,3 +20,6 @@ egui-winit = { version = "0.37.0", default-features = false, features = ["links"
 [features]
 default = []
 debug = []
+
+[lints]
+workspace = true

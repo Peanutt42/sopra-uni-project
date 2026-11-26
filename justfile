@@ -2,17 +2,24 @@
 default:
     just --list
 
-# Runs clippy on the entire project using the fast dev cargo configuration (mold linker + cranelift codegen-backend)
-check-dev *extra_cargo_args:
-	cargo clippy --all --features hot-reload --config ./.cargo/fast_dev_config.toml {{extra_cargo_args}}
+# Run all checks/tests
+check:
+	just check-formatting
+	just check-dev-all
+	just test-dev-all
+	just check-web-all
 
-# Runs clippy on the entire project with every possible feature combination using the fast dev cargo configuration (mold linker + cranelift codegen-backend). requires cargo-hack
+# Checks formatting of entire rust code and errors on incorrect formatting
+check-formatting:
+	cargo fmt --all --check --quiet
+
+# Runs clippy on the entire project with every possible feature combination (requires cargo-hack)
 check-dev-all *extra_cargo_args:
-	cargo hack --feature-powerset --all clippy --config ./.cargo/fast_dev_config.toml {{extra_cargo_args}}
+	cargo hack --feature-powerset --all clippy {{extra_cargo_args}}
 
-# Runs the game using the fast dev cargo configuration (mold linker + cranelift codegen-backend)
-run-dev extra_cargo_args="":
-	cargo run --features hot-reload --config ./.cargo/fast_dev_config.toml {{extra_cargo_args}}
+# Runs all tests of the entire project with every possible feature combination (requires cargo-hack)
+test-dev-all *extra_cargo_args:
+	cargo hack --feature-powerset --all test {{extra_cargo_args}}
 
 # Runs the game/engine with hot-reload enabled, will rebuild the game lib when change is detected
 run-dev-hotreloadable *extra_cargo_args:
