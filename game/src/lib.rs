@@ -11,14 +11,27 @@ pub use screens::Screen;
 
 pub mod ui;
 
+mod board_layout;
+
+mod ship_render;
+
+mod game_phase;
+pub use game_phase::GamePhase;
+
 mod camera_controller;
 pub use camera_controller::CameraController;
 
 mod config;
-pub use config::Config;
+pub use config::{Config, FieldSize, ShipConfig};
 
 mod ship;
-pub use ship::ShipType;
+pub use ship::{Orientation, Position, Ship, ShipType};
+
+mod board_state;
+pub use board_state::BoardState;
+
+mod player;
+pub use player::Player;
 
 /// Just to verify if hot-reload actually happened
 pub const VERSION: u64 = 1;
@@ -31,6 +44,7 @@ pub struct Game {
 	pub spawn_counter: u32,
 	pub camera_controller: CameraController,
 	pub camera: Camera,
+	pub start_camera: Camera,
 }
 
 /// Represents the serialized game state needed when hot-reloading (different from the actual game
@@ -42,6 +56,17 @@ pub struct SerializedGame {
 	pub serialized_screen: serde_json::Value,
 	pub camera_controller: CameraController,
 	pub camera: Camera,
+	pub start_camera: Camera,
+}
+impl Game {
+	fn active_camera(&self, aspect: f32) -> Camera {
+		match &self.screen {
+			Screen::Start(_) => self.start_camera,
+			Screen::Game(screen) => self
+				.camera
+				.with_view_size(screen.view_size(&self.config, aspect)),
+		}
+	}
 }
 
 pub fn game_create() -> Game {
@@ -54,7 +79,15 @@ pub fn game_create() -> Game {
 		world,
 		spawn_counter: 0,
 		screen: Screen::default(),
-		camera: Camera::new(
+		camera: Camera::orthographic(
+			Point3::new(0.0, 20.0, 0.0),
+			Deg(-90.0).into(),
+			Deg(-90.0).into(),
+			55.0,
+			0.0,
+			1000.0,
+		),
+		start_camera: Camera::perspective(
 			Point3::new(0.0, 5.0, 20.0),
 			Deg(-90.0).into(),
 			Deg(0.0).into(),
@@ -68,7 +101,11 @@ pub fn game_create() -> Game {
 
 /// returns whether the game should continue running
 pub fn game_update(game: &mut Game, input: &Input, dt: f32, frame: u64) -> bool {
-	game.camera_controller.update(input, &mut game.camera, dt);
+	// Free-fly only applies to the start camera; the board camera stays top-down.
+	if matches!(game.screen, Screen::Start(_)) {
+		game.camera_controller
+			.update(input, &mut game.start_camera, dt);
+	}
 
 	let mut continue_running = true;
 	if let Some(new_screen) = game.screen.update(&mut continue_running, input, dt, frame) {
@@ -78,14 +115,16 @@ pub fn game_update(game: &mut Game, input: &Input, dt: f32, frame: u64) -> bool 
 }
 
 pub fn game_render(game: &Game, renderer: &mut Renderer) {
-	renderer.camera_uniform = CameraUniform::from_camera(
-		&game.camera,
-		Camera::get_aspect_from_swapchain(&renderer.swapchain_config),
-	);
+	let aspect = Camera::get_aspect_from_swapchain(&renderer.swapchain_config);
+	renderer.camera_uniform = CameraUniform::from_camera(&game.active_camera(aspect), aspect);
 
-	game.screen.render(renderer);
+	game.screen.render(renderer, &game.config);
 }
 
 pub fn game_egui_render(game: &mut Game, ctx: &egui::Context) {
-	game.screen.egui_render(ctx);
+	let viewport = ctx.viewport_rect();
+	let aspect = Camera::get_aspect(viewport.width(), viewport.height());
+	let camera = game.active_camera(aspect);
+
+	game.screen.egui_render(ctx, &camera, &game.config);
 }

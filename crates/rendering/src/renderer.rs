@@ -1,12 +1,12 @@
 use crate::{
-	Camera, Mesh, Shader, Transform, Water,
+	Camera, Mesh, ModelBounds, Shader, Transform, Water,
 	camera_uniform::CameraUniform,
 	depth_texture::DepthTexture,
-	include_model, include_shader,
+	include_centered_model, include_model, include_shader,
 	instance_buffer::InstanceBuffer,
 	instance_data::Model_InstanceData,
 	lighting::LightUniform,
-	load_obj_model,
+	load_centered_obj_model, load_obj_model,
 	shader::{CAMERA_UNIFORM_BIND_GROUP, LIGHT_UNIFORM_BIND_GROUP},
 	uniform_buffer::UniformBuffer,
 };
@@ -65,6 +65,8 @@ pub struct Renderer {
 	pub ship_instances: Vec<Transform>,
 	ship_instance_buffer: InstanceBuffer<Model_InstanceData>,
 	ship: Mesh,
+	/// Local-space bounds of `ship`; used to scale placed ships to their grid cells.
+	pub ship_model_bounds: ModelBounds,
 
 	water: Water,
 
@@ -79,7 +81,6 @@ pub struct Renderer {
 
 impl Renderer {
 	pub const MAX_CUBE_INSTANCES: usize = 50 * 50;
-	pub const MAX_SHIP_INSTANCES: usize = 2;
 
 	pub async fn new(window: Arc<Window>, vsync: bool) -> CreateRendererResult {
 		#[cfg(target_arch = "wasm32")]
@@ -236,13 +237,11 @@ impl Renderer {
 			swapchain_texture_view_format
 		);
 
-		let ship_instances = vec![Transform::default(); Self::MAX_SHIP_INSTANCES];
-		let ship_instance_data = ship_instances
-			.iter()
-			.map(|t| t.to_model_instance_data())
-			.collect();
-		let ship_instance_buffer = InstanceBuffer::new(ship_instance_data, &device);
-		let ship = include_model!("../../../assets/models/demo_ship/demo_ship.obj", &device)?;
+		let (ship, ship_model_bounds) =
+			include_centered_model!("../../../assets/models/demo_ship/demo_ship.obj", &device)?;
+		let ship_instances = Vec::new();
+		let ship_instance_buffer =
+			InstanceBuffer::new(vec![Transform::default().to_model_instance_data()], &device);
 
 		let water = Water::new(
 			&device,
@@ -277,6 +276,7 @@ impl Renderer {
 			ship_instances,
 			ship_instance_buffer,
 			ship,
+			ship_model_bounds,
 			light_uniform,
 			light_uniform_buffer,
 			cube_instances: instances,
@@ -340,7 +340,7 @@ impl Renderer {
 			.iter()
 			.map(|instance| instance.to_model_instance_data())
 			.collect::<Vec<_>>();
-		self.cube_instance_buffer.update(&self.queue);
+		self.cube_instance_buffer.update(&self.queue, &self.device);
 
 		self.camera_uniform_buffer
 			.update(self.camera_uniform, &self.queue);
@@ -353,7 +353,7 @@ impl Renderer {
 			.iter()
 			.map(Transform::to_model_instance_data)
 			.collect();
-		self.ship_instance_buffer.update(&self.queue);
+		self.ship_instance_buffer.update(&self.queue, &self.device);
 
 		self.water.update(delta_time, &self.queue);
 

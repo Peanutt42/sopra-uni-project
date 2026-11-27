@@ -19,15 +19,15 @@ impl Default for Config {
 			board: FieldSize::default(),
 			ships: vec![
 				ShipConfig {
-					type_: ShipType::Explorer,
+					ship_type: ShipType::Explorer,
 					amount: NonZero::new(1).unwrap(),
 				},
 				ShipConfig {
-					type_: ShipType::Cruiser,
+					ship_type: ShipType::Cruiser,
 					amount: NonZero::new(1).unwrap(),
 				},
 				ShipConfig {
-					type_: ShipType::Mothership,
+					ship_type: ShipType::Mothership,
 					amount: NonZero::new(1).unwrap(),
 				},
 			],
@@ -49,15 +49,56 @@ impl Config {
 		Self::get_config_dir().join("configuration.json")
 	}
 
-	/// returns if the configuration is valid (there is a very small chance false positives when
-	/// ship shapes are very weird, too demanding to check)
+	/// Merges duplicate ship types.
+	pub fn normalized_ships(&self) -> Vec<ShipConfig> {
+		let mut normalized: Vec<ShipConfig> = Vec::new();
+
+		for ship_config in &self.ships {
+			if let Some(existing) = normalized
+				.iter_mut()
+				.find(|existing| existing.ship_type == ship_config.ship_type)
+			{
+				let amount = existing.amount.get() + ship_config.amount.get();
+				existing.amount =
+					NonZero::new(amount).expect("sum of non-zero amounts is non-zero");
+			} else {
+				normalized.push(ship_config.clone());
+			}
+		}
+
+		normalized
+	}
+
+	/// Returns whether the configuration can be played with.
 	pub(crate) fn validate(&self) -> Result<(), ConfigValidationError> {
-		let total_field_cell_count = self.board.x * self.board.y;
-		let total_ship_cell_count: usize = self
-			.ships
+		if self.board.x == 0 || self.board.y == 0 {
+			return Err(ConfigValidationError::EmptyBoard);
+		}
+
+		let ship_configs = self.normalized_ships();
+		let max_ship_length = ship_configs
 			.iter()
-			.map(|ship_config| ship_config.type_.get_cell_count() * ship_config.amount.get())
-			.sum();
+			.map(|ship_config| ship_config.ship_type.cell_count())
+			.max()
+			.unwrap_or(0);
+
+		if max_ship_length > self.board.x.max(self.board.y) {
+			return Err(ConfigValidationError::ShipDoesNotFit {
+				cell_count: max_ship_length,
+				board_x: self.board.x,
+				board_y: self.board.y,
+			});
+		}
+
+		let total_field_cell_count = self.board.x.saturating_mul(self.board.y);
+		let total_ship_cell_count = ship_configs.iter().fold(0usize, |total, ship_config| {
+			total.saturating_add(
+				ship_config
+					.ship_type
+					.cell_count()
+					.saturating_mul(ship_config.amount.get()),
+			)
+		});
 
 		if total_field_cell_count < total_ship_cell_count {
 			Err(ConfigValidationError::TooSmallFieldSize {
@@ -148,6 +189,14 @@ impl Config {
 
 #[derive(Debug, Clone, Copy, Error)]
 pub enum ConfigValidationError {
+	#[error("the board must have at least one cell in each direction")]
+	EmptyBoard,
+	#[error("a ship occupying {cell_count} cells does not fit on a {board_x}x{board_y} board")]
+	ShipDoesNotFit {
+		cell_count: usize,
+		board_x: usize,
+		board_y: usize,
+	},
 	#[error(
 		"there are only {total_field_cell_count} cells on the board but all ships occupy {total_ship_cell_count} cells in total"
 	)]
@@ -167,7 +216,7 @@ pub struct WSServerConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ShipConfig {
 	#[serde(rename = "type")] // type is keyword
-	pub type_: ShipType,
+	pub ship_type: ShipType,
 	pub amount: NonZero<usize>,
 }
 

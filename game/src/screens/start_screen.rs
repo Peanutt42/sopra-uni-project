@@ -3,7 +3,7 @@ use sphynx_input::Input;
 use sphynx_logging::info;
 use sphynx_rendering::Renderer;
 
-use crate::{Screen, screens::GameScreen};
+use crate::Screen;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StartScreen {
@@ -35,13 +35,13 @@ impl StartScreen {
 
 		if self.go_to_game_screen {
 			info!(Game, "Switching to GameScreen");
-			return Some(Screen::Game(GameScreen::default()));
+			return Some(Screen::Game(Box::default()));
 		}
 
 		None
 	}
 
-	pub fn render(&self, renderer: &mut Renderer) {
+	pub fn render(&self, renderer: &mut Renderer, _config: &crate::Config) {
 		renderer.cube_instances.clear();
 		renderer.ship_instances.clear();
 	}
