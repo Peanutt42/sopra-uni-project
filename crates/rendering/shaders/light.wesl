@@ -12,7 +12,7 @@ fn light_equation(
 	frag_pos: vec3<f32>,
 	frag_color: vec3<f32>,
 	frag_normal: vec3<f32>,
-	metalic: f32,
+	metallic: f32,
 	roughness: f32,
 ) -> vec3<f32> {
 	// calculate per-light radiance
@@ -43,7 +43,7 @@ fn light_equation(
 	// multiply k_d by the inverse metalness such that only non-metals
 	// have diffuse lighting, or a linear blend if partly metal (pure metals
 	// have no diffuse light).
-	k_d *= 1.0 - metalic;
+	k_d *= 1.0 - metallic;
 
 	// scale light by n_dot_l
 	let n_dot_l = max(dot(n, l), 0.0);

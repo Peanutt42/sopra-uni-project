@@ -8,7 +8,7 @@ mod mesh;
 mod model;
 mod renderer;
 mod shader;
-mod transfrom;
+mod transform;
 mod uniform_buffer;
 mod vertex;
 mod water;
@@ -20,7 +20,7 @@ pub use mesh::Mesh;
 pub use model::load_obj_model;
 pub use renderer::{CreateRendererError, CreateRendererResult, Renderer};
 pub use shader::Shader;
-pub use transfrom::Transform;
+pub use transform::Transform;
 pub use water::Water;
 
 #[cfg(all(feature = "hot-reload", target_arch = "wasm32"))]

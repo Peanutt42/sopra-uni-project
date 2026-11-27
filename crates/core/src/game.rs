@@ -1,7 +1,7 @@
 use sphynx_input::Input;
 use sphynx_rendering::Renderer;
 
-/// vtable of function ptrs for interacting with the game library without linking to the games
+/// vtable of function pointers for interacting with the game library without linking to the games
 /// functions directly in order to support hot-reloading the game library.
 pub struct GameApi<Game, SerializedGame> {
 	pub create: fn() -> *mut Game,

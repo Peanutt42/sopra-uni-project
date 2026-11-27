@@ -92,7 +92,7 @@ impl Shader {
 	) -> Self {
 		assert!(
 			swapchain_texture_view_format.is_srgb(),
-			"the texture view of the swapchain texture should always be srgb, we dont apply gamma correction ourselfs"
+			"the texture view of the swapchain texture should always be srgb, we dont apply gamma correction ourselves"
 		);
 
 		let pipeline = create_pipeline(

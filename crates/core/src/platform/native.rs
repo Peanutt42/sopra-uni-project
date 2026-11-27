@@ -36,7 +36,7 @@ impl RendererInit {
 			result: Some(pollster::block_on(Renderer::new(window, vsync))),
 		}
 	}
-	/// immediatly returns the renderer result and also removes the result stored in [self]
+	/// immediately returns the renderer result and also removes the result stored in [self]
 	pub fn poll(&mut self) -> Option<CreateRendererResult> {
 		self.result.take()
 	}

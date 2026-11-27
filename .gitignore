@@ -23,3 +23,6 @@ Engine.log
 .direnv
 
 result
+
+# Local GitLab CI test runs
+.gitlab-ci-local/
