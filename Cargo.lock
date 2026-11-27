@@ -995,6 +995,7 @@ dependencies = [
  "sphynx_input",
  "sphynx_logging",
  "sphynx_rendering",
+ "thiserror 2.0.21",
 ]
 
 [[package]]

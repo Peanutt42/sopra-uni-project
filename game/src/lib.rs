@@ -46,7 +46,6 @@ pub struct SerializedGame {
 
 pub fn game_create() -> Game {
 	let config = Config::load();
-	dbg!(&config);
 
 	let world = hecs::World::new();
 

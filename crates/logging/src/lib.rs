@@ -37,6 +37,7 @@ impl LogTopic {
 
 #[derive(Debug, Copy, Clone)]
 pub enum LogVerbosity {
+	Debug,
 	Info,
 	Warning,
 	Error,
@@ -45,14 +46,16 @@ pub enum LogVerbosity {
 impl LogVerbosity {
 	pub fn to_string(self) -> &'static str {
 		match self {
-			LogVerbosity::Info => "INFO",
-			LogVerbosity::Warning => "WARN",
-			LogVerbosity::Error => "ERR ",
+			LogVerbosity::Debug => "DEBUG",
+			LogVerbosity::Info => "INFO ",
+			LogVerbosity::Warning => "WARN ",
+			LogVerbosity::Error => "ERROR",
 		}
 	}
 
 	pub fn colorize(self, msg: String) -> ColoredString {
 		match self {
+			LogVerbosity::Debug => msg.bright_black(),
 			LogVerbosity::Info => msg.bright_white(),
 			LogVerbosity::Warning => msg.yellow(),
 			LogVerbosity::Error => msg.red(),
@@ -97,6 +100,13 @@ pub fn log(verbosity: LogVerbosity, topic: LogTopic, formatted: String) {
 			Err(e) => eprintln!("failed to create engine log (Engine.log): {e}"),
 		}
 	}
+}
+
+#[macro_export]
+macro_rules! debug {
+	($topic:ident, $($arg:tt)*) => {{
+		$crate::log($crate::LogVerbosity::Debug, $crate::LogTopic::$topic, format!($($arg)*));
+	}};
 }
 
 #[macro_export]
