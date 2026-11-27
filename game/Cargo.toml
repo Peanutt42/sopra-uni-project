@@ -6,23 +6,23 @@ edition = "2024"
 [lib]
 # was rlib and dylib, but since wasm does not support dylib and we only have a c abi api,
 # we use cdylib instead of dylib, still works the same
-crate-type = ["rlib", "cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+cgmath-next = { workspace = true }
+egui = { workspace = true }
 hecs = { workspace = true }
-sphynx_logging = { workspace = true }
-sphynx_hecs_component = { workspace = true }
-sphynx_input = { workspace = true }
-sphynx_rendering = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-egui = { workspace = true }
-cgmath-next = { workspace = true }
+sphynx_hecs_component = { workspace = true }
+sphynx_input = { workspace = true }
+sphynx_logging = { workspace = true }
+sphynx_rendering = { workspace = true }
 
 [features]
 default = []
-hot-reload = ["sphynx_rendering/hot-reload"]
 debug = ["sphynx_rendering/debug"]
+hot-reload = ["sphynx_rendering/hot-reload"]
 
 [lints]
 workspace = true

@@ -77,6 +77,8 @@
         nativeBuildInputs = with pkgs; [
           pkg-config
           cargo-hack # for running clippy and testing on all feature combinations
+          codebook # for typo checking
+          tombi # for toml formatting and linting
         ];
         buildInputs = runtimeLibsFor pkgs;
       };
@@ -143,10 +145,37 @@
         };
         treefmtEval = treefmt-nix.lib.evalModule pkgs {
           projectRootFile = "flake.nix";
-          programs.nixfmt.enable = true;
-          programs.rustfmt = {
-            enable = true;
-            package = toolchainFor pkgs;
+          programs = {
+            nixfmt.enable = true;
+            rustfmt = {
+              enable = true;
+              package = toolchainFor pkgs;
+            };
+            just = {
+              enable = true;
+              indentation = "\t";
+            };
+            wgslfmt = {
+              enable = true;
+              tabs = true;
+              includes = [
+                "*.wgsl"
+                "*.wesl"
+              ];
+            };
+            # for *.toml
+            taplo = {
+              enable = true;
+              excludes = [ ".direnv/**" ];
+              settings.formatting = {
+                indent_string = "\t";
+                array_trailing_comma = false;
+              };
+            };
+            mdformat.enable = true;
+            # mainly for ./.gitlab-ci.yml
+            yamlfmt.enable = true;
+            yamllint.enable = true;
           };
         };
       in

@@ -4,18 +4,21 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-hecs = { workspace = true }
-sphynx_hecs_component = { workspace = true }
-winit = { workspace = true }
-wgpu = { workspace = true }
 egui = { workspace = true }
 egui-wgpu = { version = "0.37.0", features = ["winit"] }
+hecs = { workspace = true }
+sphynx_hecs_component = { workspace = true }
+wgpu = { workspace = true }
+winit = { workspace = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 egui-winit = "0.37.0"
+
 # egui-winit uses arboard by default, which has no wasm32 backend.
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-egui-winit = { version = "0.37.0", default-features = false, features = ["links"] }
+egui-winit = { version = "0.37.0", default-features = false, features = [
+	"links"
+] }
 
 [features]
 default = []

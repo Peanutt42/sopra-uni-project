@@ -4,27 +4,27 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-sphynx_logging = { workspace = true }
-sphynx_derive_vertex_attrib = { workspace = true }
-sphynx_wesl_include = { workspace = true }
-sphynx_wesl = { workspace = true, optional = true }
-sphynx_egui = { workspace = true }
-winit = { workspace = true }
-wgpu = { workspace = true }
-thiserror = { workspace = true }
-cgmath-next = { workspace = true }
 bytemuck = { workspace = true }
-tobj = { version = "4.0.5", default-features = false }
-serde = { workspace = true }
+cgmath-next = { workspace = true }
 notify-debouncer-full = { version = "0.7.0", optional = true }
+serde = { workspace = true }
+sphynx_derive_vertex_attrib = { workspace = true }
+sphynx_egui = { workspace = true }
+sphynx_logging = { workspace = true }
+sphynx_wesl = { workspace = true, optional = true }
+sphynx_wesl_include = { workspace = true }
+thiserror = { workspace = true }
+tobj = { version = "4.0.5", default-features = false }
+wgpu = { workspace = true }
+winit = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wgpu = { workspace = true, features = ["webgpu", "webgl"] }
+wgpu = { workspace = true, features = ["webgl", "webgpu"] }
 
 [features]
 default = []
-hot-reload = ["dep:sphynx_wesl", "dep:notify-debouncer-full"]
 debug = ["sphynx_egui/debug"]
+hot-reload = ["dep:notify-debouncer-full", "dep:sphynx_wesl"]
 
 [lints]
 workspace = true

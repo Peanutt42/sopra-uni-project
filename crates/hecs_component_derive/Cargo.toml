@@ -8,9 +8,9 @@ description = "Derive macro that registers a hecs component"
 proc-macro = true
 
 [dependencies]
+proc-macro2 = "1.0"
 quote = { workspace = true }
 syn = { workspace = true }
-proc-macro2 = "1.0"
 
 [lints]
 workspace = true

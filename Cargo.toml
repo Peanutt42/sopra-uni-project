@@ -3,45 +3,31 @@ name = "sphynx_engine"
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
-sphynx_core = { workspace = true }
-sphynx_logging = { workspace = true }
-sphynx_input = { workspace = true }
-sphynx_rendering = { workspace = true }
-sphynx_hecs_component = { workspace = true }
-sphynx_hecs_component_derive = { workspace = true }
-egui = { workspace = true }
-hecs = { workspace = true }
-hot-lib-reloader = { workspace = true, optional = true }
-game = { path = "game" }
-
-[features]
-default = []
-hot-reload = ["sphynx_core/hot-reload", "sphynx_rendering/hot-reload", "game/hot-reload", "dep:hot-lib-reloader"]
-debug = ["sphynx_core/debug", "sphynx_rendering/debug", "game/debug"]
-
-[lints]
-workspace = true
-
 [workspace]
 members = [
 	"crates/core",
-	"crates/logging",
-	"crates/input",
-	"crates/rendering",
-	"crates/egui",
 	"crates/derive_vertex_attrib",
+	"crates/egui",
 	"crates/hecs_component",
 	"crates/hecs_component_derive",
 	"crates/input",
 	"crates/logging",
 	"crates/rendering",
+	"crates/web",
 	"crates/wesl",
-	"crates/wesl_include",
-	"crates/web"
+	"crates/wesl_include"
 ]
 
 [workspace.dependencies]
+bytemuck = { version = "1.25", features = ["derive"] }
+cgmath-next = { version = "0.18", features = ["serde"] }
+egui = { version = "0.37.0", features = ["default_fonts", "serde"] }
+
+hecs = "0.11"
+hot-lib-reloader = "0.8.2"
+quote = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 sphynx_core = { path = "crates/core" }
 sphynx_derive_vertex_attrib = { path = "crates/derive_vertex_attrib" }
 sphynx_egui = { path = "crates/egui" }
@@ -50,20 +36,15 @@ sphynx_hecs_component_derive = { path = "crates/hecs_component_derive" }
 sphynx_input = { path = "crates/input" }
 sphynx_logging = { path = "crates/logging" }
 sphynx_rendering = { path = "crates/rendering" }
-sphynx_wesl_include = { path = "crates/wesl_include" }
 sphynx_wesl = { path = "crates/wesl" }
-thiserror = "2.0"
-winit = "0.30.13"
-wgpu = "30.0.1"
-cgmath-next = { version = "0.18", features = ["serde"] }
-bytemuck = { version = "1.25", features = ["derive"] }
-hecs = "0.11"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-hot-lib-reloader = "0.8.2"
-quote = "1.0"
+sphynx_wesl_include = { path = "crates/wesl_include" }
 syn = { version = "3", features = ["derive", "parsing"] }
-egui = { version = "0.37.0", features = ["default_fonts", "serde"] }
+thiserror = "2.0"
+wgpu = "30.0.1"
+winit = "0.30.13"
+
+[workspace.lints.clippy]
+all = "deny"
 
 # basically errors-on-warnings, but requires every member crate to have
 # [lints]
@@ -71,5 +52,28 @@ egui = { version = "0.37.0", features = ["default_fonts", "serde"] }
 # in order to actually apply
 [workspace.lints.rust]
 warnings = "deny"
-[workspace.lints.clippy]
-all = "deny"
+
+[dependencies]
+egui = { workspace = true }
+game = { path = "game" }
+hecs = { workspace = true }
+hot-lib-reloader = { workspace = true, optional = true }
+sphynx_core = { workspace = true }
+sphynx_hecs_component = { workspace = true }
+sphynx_hecs_component_derive = { workspace = true }
+sphynx_input = { workspace = true }
+sphynx_logging = { workspace = true }
+sphynx_rendering = { workspace = true }
+
+[features]
+default = []
+debug = ["game/debug", "sphynx_core/debug", "sphynx_rendering/debug"]
+hot-reload = [
+	"dep:hot-lib-reloader",
+	"game/hot-reload",
+	"sphynx_core/hot-reload",
+	"sphynx_rendering/hot-reload"
+]
+
+[lints]
+workspace = true

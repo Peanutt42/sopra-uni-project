@@ -5,9 +5,9 @@ edition = "2024"
 
 [dependencies]
 hecs = { workspace = true }
+inventory = "0.3.25"
 serde = { workspace = true }
 serde_json = { workspace = true }
-inventory = "0.3.25"
 sphynx_hecs_component_derive = { path = "../hecs_component_derive" }
 
 [lints]
