@@ -118,6 +118,7 @@
 
               checkPhase = ''
                 runHook preCheck
+                export CARGO_BUILD_WARNINGS="deny"
                 # run clippy and tests on all feature combinations for linux
                 cargo hack --feature-powerset --all clippy
                 cargo hack --feature-powerset --all test

@@ -9,6 +9,3 @@ inventory = "0.3.25"
 serde = { workspace = true }
 serde_json = { workspace = true }
 sphynx_hecs_component_derive = { path = "../hecs_component_derive" }
-
-[lints]
-workspace = true

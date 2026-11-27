@@ -16,6 +16,3 @@ web-sys = { version = "0.3", features = ["Document", "Element", "Window"] }
 [features]
 default = []
 debug = ["game/debug", "sphynx_core/debug"]
-
-[lints]
-workspace = true

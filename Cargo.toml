@@ -43,16 +43,6 @@ thiserror = "2.0"
 wgpu = "30.0.1"
 winit = "0.30.13"
 
-[workspace.lints.clippy]
-all = "deny"
-
-# basically errors-on-warnings, but requires every member crate to have
-# [lints]
-# workspace = true
-# in order to actually apply
-[workspace.lints.rust]
-warnings = "deny"
-
 [dependencies]
 egui = { workspace = true }
 game = { path = "game" }
@@ -74,6 +64,3 @@ hot-reload = [
 	"sphynx_core/hot-reload",
 	"sphynx_rendering/hot-reload"
 ]
-
-[lints]
-workspace = true
