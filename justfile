@@ -20,7 +20,7 @@ check-typos:
 
 # Runs clippy on the entire project using the fast dev cargo configuration (mold linker + cranelift codegen-backend)
 check-dev *extra_cargo_args:
-	cargo clippy --all --features hot-reload --config ./.cargo/fast_dev_config.toml {{ extra_cargo_args }}
+	CARGO_BUILD_WARNINGS="deny" cargo clippy --all --features hot-reload --config ./.cargo/fast_dev_config.toml {{ extra_cargo_args }}
 
 # Checks formatting of entire rust code and errors on incorrect formatting
 check-formatting:
@@ -28,11 +28,11 @@ check-formatting:
 
 # Runs clippy on the entire project with every possible feature combination (requires cargo-hack)
 check-dev-all *extra_cargo_args:
-	cargo hack --feature-powerset --all clippy {{ extra_cargo_args }}
+	CARGO_BUILD_WARNINGS="deny" cargo hack --feature-powerset --all clippy {{ extra_cargo_args }}
 
 # Runs all tests of the entire project with every possible feature combination (requires cargo-hack)
 test-dev-all *extra_cargo_args:
-	cargo hack --feature-powerset --all test {{ extra_cargo_args }}
+	CARGO_BUILD_WARNINGS="deny" cargo hack --feature-powerset --all test {{ extra_cargo_args }}
 
 # Runs the game/engine with hot-reload enabled, will rebuild the game lib when change is detected
 run-dev-hotreloadable *extra_cargo_args:
@@ -55,8 +55,8 @@ serve-web *extra_args:
 
 # Run clippy on the entire project using the wasm target
 check-web *extra_args:
-	cargo clippy --all --target wasm32-unknown-unknown {{ extra_args }}
+	CARGO_BUILD_WARNINGS="deny" cargo clippy --all --target wasm32-unknown-unknown {{ extra_args }}
 
 # Run clippy on the entire project with every possible feature combination (except for hot-reload which is unsupported) using the wasm target. requires cargo-hack
 check-web-all *extra_args:
-	cargo hack --feature-powerset --all --exclude-features hot-reload clippy --target wasm32-unknown-unknown {{ extra_args }}
+	CARGO_BUILD_WARNINGS="deny" cargo hack --feature-powerset --all --exclude-features hot-reload clippy --target wasm32-unknown-unknown {{ extra_args }}

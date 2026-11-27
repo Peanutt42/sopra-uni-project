@@ -6,6 +6,3 @@ edition = "2024"
 [dependencies]
 cgmath-next = { workspace = true }
 winit = { workspace = true }
-
-[lints]
-workspace = true

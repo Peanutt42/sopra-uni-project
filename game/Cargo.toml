@@ -25,6 +25,3 @@ directories = "6.0"
 default = []
 debug = ["sphynx_rendering/debug"]
 hot-reload = ["sphynx_rendering/hot-reload"]
-
-[lints]
-workspace = true

@@ -27,6 +27,3 @@ wasm-bindgen-futures = "0.4"
 default = []
 debug = ["sphynx_egui/debug"]
 hot-reload = ["dep:hot-lib-reloader", "sphynx_rendering/hot-reload"]
-
-[lints]
-workspace = true
