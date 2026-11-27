@@ -14,11 +14,18 @@ pub mod ui;
 mod camera_controller;
 pub use camera_controller::CameraController;
 
+mod config;
+pub use config::Config;
+
+mod ship;
+pub use ship::ShipType;
+
 /// Just to verify if hot-reload actually happened
 pub const VERSION: u64 = 1;
 
 /// Stores the games state
 pub struct Game {
+	pub config: Config,
 	pub screen: Screen,
 	pub world: hecs::World,
 	pub spawn_counter: u32,
@@ -29,6 +36,7 @@ pub struct Game {
 /// Represents the serialized game state needed when hot-reloading (different from the actual game
 /// saving mechanic!)
 pub struct SerializedGame {
+	pub config: Config,
 	pub spawn_counter: u32,
 	pub world_snapshot: sphynx_hecs_component::serialization::Snapshot,
 	pub serialized_screen: serde_json::Value,
@@ -37,9 +45,13 @@ pub struct SerializedGame {
 }
 
 pub fn game_create() -> Game {
+	let config = Config::load();
+	dbg!(&config);
+
 	let world = hecs::World::new();
 
 	Game {
+		config,
 		world,
 		spawn_counter: 0,
 		screen: Screen::default(),

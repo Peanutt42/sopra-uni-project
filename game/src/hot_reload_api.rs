@@ -73,6 +73,7 @@ pub unsafe fn sphynx_engine_game_serialize(game: *const Game) -> SerializedGame 
 
 	match sphynx_hecs_component::serialization::serialize(&game.world) {
 		Ok(world_snapshot) => SerializedGame {
+			config: game.config.clone(),
 			spawn_counter: game.spawn_counter,
 			world_snapshot,
 			serialized_screen,
@@ -103,6 +104,7 @@ pub fn sphynx_engine_game_deserialize(serialized_game: SerializedGame) -> *mut G
 	let game =
 		match sphynx_hecs_component::serialization::deserialize(serialized_game.world_snapshot) {
 			Ok(world) => Game {
+				config: serialized_game.config,
 				world,
 				spawn_counter: serialized_game.spawn_counter,
 				screen,
