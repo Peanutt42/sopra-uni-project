@@ -18,6 +18,8 @@ sphynx_hecs_component = { workspace = true }
 sphynx_input = { workspace = true }
 sphynx_logging = { workspace = true }
 sphynx_rendering = { workspace = true }
+thiserror = { workspace = true }
+directories = "6.0"
 
 [features]
 default = []
