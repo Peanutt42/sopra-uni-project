@@ -21,6 +21,9 @@ winit = { workspace = true }
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wgpu = { workspace = true, features = ["webgl", "webgpu"] }
 
+[dev-dependencies]
+serde_json = { workspace = true }
+
 [features]
 default = []
 debug = ["sphynx_egui/debug"]

@@ -1,7 +1,7 @@
 use crate::instance_data::InstanceData;
 use crate::shader::INSTANCE_BUFFER_BIND_SLOT;
 use wgpu::{
-	Buffer, BufferUsages, Device, Queue, RenderPass,
+	Buffer, BufferDescriptor, BufferUsages, Device, Queue, RenderPass,
 	util::{BufferInitDescriptor, DeviceExt},
 };
 
@@ -22,9 +22,25 @@ impl<I: InstanceData> InstanceBuffer<I> {
 		Self { instances, buffer }
 	}
 
-	/// only actually updates when the queue is submitted with [wgpu::Queue::submit]
-	pub fn update(&self, queue: &Queue) {
-		queue.write_buffer(&self.buffer, 0, bytemuck::cast_slice(&self.instances));
+	/// Uploads the current instances, growing the GPU buffer when needed.
+	pub fn update(&mut self, queue: &Queue, device: &Device) {
+		let required_bytes = (self.instances.len() * std::mem::size_of::<I>()) as u64;
+
+		if required_bytes > self.buffer.size() {
+			let capacity = required_bytes
+				.max(self.buffer.size().saturating_mul(2))
+				.max(std::mem::size_of::<I>() as u64);
+			self.buffer = device.create_buffer(&BufferDescriptor {
+				label: Some("Instance Buffer"),
+				size: capacity,
+				usage: BufferUsages::VERTEX | BufferUsages::COPY_DST,
+				mapped_at_creation: false,
+			});
+		}
+
+		if required_bytes > 0 {
+			queue.write_buffer(&self.buffer, 0, bytemuck::cast_slice(&self.instances));
+		}
 	}
 
 	/// binds the instance buffer to a shader

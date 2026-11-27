@@ -3,7 +3,7 @@ use cgmath::{Matrix3, Matrix4, Quaternion, Vector3, Zero};
 use crate::instance_data::Model_InstanceData;
 
 /// stores the position, rotation and scale in 3D
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Transform {
 	position: Vector3<f32>,
 	rotation: Quaternion<f32>,
@@ -19,7 +19,6 @@ impl Transform {
 		}
 	}
 
-	/// returns the GPU InstanceData buffer representing this transform
 	pub fn to_model_instance_data(&self) -> Model_InstanceData {
 		let rotation = Matrix3::from(self.rotation);
 		let model = Matrix4::from_translation(self.position)

@@ -3062,6 +3062,7 @@ dependencies = [
  "cgmath-next",
  "notify-debouncer-full 0.7.0",
  "serde",
+ "serde_json",
  "sphynx_derive_vertex_attrib",
  "sphynx_egui",
  "sphynx_logging",

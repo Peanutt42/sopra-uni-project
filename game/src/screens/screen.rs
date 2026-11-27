@@ -1,13 +1,13 @@
 use serde::{Deserialize, Serialize};
 use sphynx_input::Input;
-use sphynx_rendering::Renderer;
+use sphynx_rendering::{Camera, Renderer};
 
 use crate::screens::{GameScreen, StartScreen};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Screen {
 	Start(StartScreen),
-	Game(GameScreen),
+	Game(Box<GameScreen>),
 }
 impl Default for Screen {
 	fn default() -> Self {
@@ -29,17 +29,17 @@ impl Screen {
 		}
 	}
 
-	pub fn render(&self, renderer: &mut Renderer) {
+	pub fn render(&self, renderer: &mut Renderer, config: &crate::Config) {
 		match self {
-			Self::Start(start) => start.render(renderer),
-			Self::Game(game) => game.render(renderer),
+			Self::Start(start) => start.render(renderer, config),
+			Self::Game(game) => game.render(renderer, config),
 		}
 	}
 
-	pub fn egui_render(&mut self, ctx: &egui::Context) {
+	pub fn egui_render(&mut self, ctx: &egui::Context, camera: &Camera, config: &crate::Config) {
 		match self {
 			Self::Start(start) => start.egui_render(ctx),
-			Self::Game(game) => game.egui_render(ctx),
+			Self::Game(game) => game.egui_render(ctx, camera, config),
 		}
 	}
 }

@@ -13,11 +13,11 @@ mod uniform_buffer;
 mod vertex;
 mod water;
 
-pub use camera::Camera;
+pub use camera::{Camera, Projection};
 pub use camera_uniform::CameraUniform;
 pub use lighting::LightUniform;
 pub use mesh::Mesh;
-pub use model::load_obj_model;
+pub use model::{ModelBounds, load_centered_obj_model, load_obj_model};
 pub use renderer::{CreateRendererError, CreateRendererResult, Renderer};
 pub use shader::Shader;
 pub use transform::Transform;

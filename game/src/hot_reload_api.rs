@@ -77,7 +77,8 @@ pub unsafe fn sphynx_engine_game_serialize(game: *const Game) -> SerializedGame 
 			spawn_counter: game.spawn_counter,
 			world_snapshot,
 			serialized_screen,
-			camera: game.camera.clone(),
+			camera: game.camera,
+			start_camera: game.start_camera,
 			camera_controller: game.camera_controller,
 		},
 		Err(err) => {
@@ -109,6 +110,7 @@ pub fn sphynx_engine_game_deserialize(serialized_game: SerializedGame) -> *mut G
 				spawn_counter: serialized_game.spawn_counter,
 				screen,
 				camera: serialized_game.camera,
+				start_camera: serialized_game.start_camera,
 				camera_controller: serialized_game.camera_controller,
 			},
 			Err(e) => {
