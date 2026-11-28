@@ -989,6 +989,7 @@ dependencies = [
  "directories",
  "egui",
  "hecs",
+ "js-sys",
  "serde",
  "serde_json",
  "sphynx_hecs_component",
@@ -996,6 +997,8 @@ dependencies = [
  "sphynx_logging",
  "sphynx_rendering",
  "thiserror 2.0.21",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]

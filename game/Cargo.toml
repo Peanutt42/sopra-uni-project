@@ -21,6 +21,11 @@ sphynx_rendering = { workspace = true }
 thiserror = { workspace = true }
 directories = "6.0"
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+web-sys = { workspace = true }
+wasm-bindgen = { workspace = true }
+js-sys = { workspace = true }
+
 [features]
 default = []
 debug = ["sphynx_rendering/debug"]
